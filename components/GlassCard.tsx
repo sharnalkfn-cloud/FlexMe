@@ -1,6 +1,6 @@
 import { BlurView } from 'expo-blur';
 import React, { useCallback } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -44,11 +44,19 @@ export function GlassCard({
 
   const content = (
     <View style={[styles.wrapper, { borderRadius: radius }, style]}>
-      <BlurView
-        tint="dark"
-        intensity={intensity}
-        style={[StyleSheet.absoluteFillObject, { borderRadius: radius }]}
-      />
+      {Platform.OS === 'web' ? (
+        // Safari breaks backdrop-filter when any ancestor has a CSS
+        // transform (react-navigation's screen containers do), rendering
+        // it as opaque white instead of blurring. Use a flat translucent
+        // fill on web instead of relying on BlurView there.
+        <View style={[StyleSheet.absoluteFillObject, styles.webGlassFallback, { borderRadius: radius }]} />
+      ) : (
+        <BlurView
+          tint="dark"
+          intensity={intensity}
+          style={[StyleSheet.absoluteFillObject, { borderRadius: radius }]}
+        />
+      )}
       <View style={styles.content}>{children}</View>
     </View>
   );
@@ -75,6 +83,9 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.glassBg,
     borderWidth: 0.5,
     borderColor: Colors.glassBorder,
+  },
+  webGlassFallback: {
+    backgroundColor: 'rgba(10,10,16,0.72)',
   },
   content: {
     width: '100%',

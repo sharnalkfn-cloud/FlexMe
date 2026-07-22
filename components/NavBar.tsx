@@ -140,7 +140,14 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
       style={[styles.container, { bottom: insets.bottom + 14 }, mountStyle]}
       pointerEvents="box-none">
       <View style={styles.pillWrapper}>
-        <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFillObject} />
+        {Platform.OS === 'web' ? (
+          // Safari breaks backdrop-filter when an ancestor has a CSS
+          // transform (react-navigation's screen containers do), rendering
+          // it as opaque white. Use a flat translucent fill on web instead.
+          <View style={[StyleSheet.absoluteFillObject, styles.webGlassFallback]} />
+        ) : (
+          <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFillObject} />
+        )}
         <View style={styles.row}>
           {state.routes.map((route, index) => (
             <TabItem
@@ -162,6 +169,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
+  },
+  webGlassFallback: {
+    backgroundColor: 'rgba(10,10,16,0.72)',
   },
   pillWrapper: {
     borderRadius: 18,
