@@ -16,11 +16,11 @@ import type { ImageSourcePropType } from 'react-native';
  * in SceneCard / MasonrySceneCard.
  */
 export const SCENE_IMAGES: Partial<Record<string, ImageSourcePropType>> = {
-  // 'lamborghini_pov': require('../assets/images/scenes/lamborghini-pov.jpg'),
-  // 'dubai_jetski': require('../assets/images/scenes/dubai-jetski.jpg'),
-  // 'dubai_shopping_lambo': require('../assets/images/scenes/dubai-shopping-lambo.jpg'),
-  // 'girlfriend_jet_bugatti': require('../assets/images/scenes/girlfriend-jet-bugatti.jpg'),
-  // 'highrise_pool': require('../assets/images/scenes/highrise-pool.jpg'),
+  'lamborghini_pov': require('../assets/images/scenes/lamborghini-pov.png'),
+  'dubai_jetski': require('../assets/images/scenes/dubai-jetski.png'),
+  // 'dubai_shopping_lambo': require('../assets/images/scenes/dubai-shopping-lambo.png'),
+  // 'girlfriend_jet_bugatti': require('../assets/images/scenes/girlfriend-jet-bugatti.png'),
+  // 'highrise_pool': require('../assets/images/scenes/highrise-pool.png'),
 };
 
 export function getSceneImageSource(sceneId: string): ImageSourcePropType | undefined {
