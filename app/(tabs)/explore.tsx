@@ -1,112 +1,313 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
+import { GlassCard } from '@/components/GlassCard';
+import { SceneCard } from '@/components/SceneCard';
+import { TrendingCarousel } from '@/components/TrendingCarousel';
+import { Colors } from '@/constants/colors';
+import {
+  ALL_SCENES,
+  EXTRA_SCENES,
+  FILTER_CATEGORIES,
+  REAL_SCENES,
+  type AnyScene,
+} from '@/constants/scenes';
+import { getGenerationHistory } from '@/hooks/useGemini';
+import { onAuthStateChanged } from '@/services/firebase';
 
-export default function TabTwoScreen() {
+const HISTORY_KEY = 'flexme_history';
+
+function buildTrendingSlides() {
+  return REAL_SCENES.slice(0, 5).map((scene, i) => ({
+    scene,
+    minis: EXTRA_SCENES.slice(i * 6, i * 6 + 6),
+  }));
+}
+
+const TRENDING_SLIDES = buildTrendingSlides();
+
+export default function ExploreScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState<(typeof FILTER_CATEGORIES)[number]>('All');
+  const [refreshing, setRefreshing] = useState(false);
+  const [generatedCount, setGeneratedCount] = useState(0);
+  const [photoURL, setPhotoURL] = useState<string | null>(null);
+
+  useEffect(() => {
+    getGenerationHistory().then((history) => setGeneratedCount(history.length));
+    const unsubscribe = onAuthStateChanged((user) => {
+      setPhotoURL(user?.photoURL ?? null);
+    });
+    return unsubscribe;
+  }, []);
+
+  const refreshCounts = useCallback(async () => {
+    const raw = await AsyncStorage.getItem(HISTORY_KEY);
+    const history = raw ? JSON.parse(raw) : [];
+    setGeneratedCount(history.length);
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await refreshCounts();
+    setRefreshing(false);
+  }, [refreshCounts]);
+
+  const filteredScenes = useMemo(() => {
+    return ALL_SCENES.filter((scene) => {
+      const matchesCategory = category === 'All' || scene.category === category;
+      const matchesSearch =
+        search.trim().length === 0 ||
+        scene.name.toLowerCase().includes(search.toLowerCase()) ||
+        scene.location.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [category, search]);
+
+  const handleScenePress = useCallback(
+    (scene: AnyScene) => {
+      router.push({ pathname: '/scene/[id]', params: { id: scene.id } });
+    },
+    [router]
+  );
+
+  const handleGenerate = useCallback(
+    (scene: AnyScene) => {
+      router.push({ pathname: '/(tabs)/generate', params: { sceneId: scene.id } });
+    },
+    [router]
+  );
+
+  const handleAvatarPress = useCallback(() => {
+    router.push('/(tabs)/profile');
+  }, [router]);
+
+  const renderHeader = useCallback(
+    () => (
+      <View>
+        <View style={styles.statsRow}>
+          <GlassCard style={styles.statChip}>
+            <Text style={styles.statValue}>{ALL_SCENES.length}</Text>
+            <Text style={styles.statLabel}>Scenes</Text>
+          </GlassCard>
+          <GlassCard style={styles.statChip}>
+            <Text style={styles.statValue}>{generatedCount}</Text>
+            <Text style={styles.statLabel}>Generated</Text>
+          </GlassCard>
+          <GlassCard style={styles.statChip}>
+            <Text style={styles.statValue}>{Math.max(0, 3 - generatedCount)}</Text>
+            <Text style={styles.statLabel}>Free left</Text>
+          </GlassCard>
+        </View>
+
+        <GlassCard style={styles.searchBar}>
+          <View style={styles.searchRow}>
+            <Ionicons name="search" size={16} color={Colors.textMuted} />
+            <TextInput
+              value={search}
+              onChangeText={setSearch}
+              placeholder="Search scenes..."
+              placeholderTextColor={Colors.textMuted}
+              style={styles.searchInput}
+            />
+          </View>
+        </GlassCard>
+
+        <FlatList
+          data={FILTER_CATEGORIES}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item}
+          contentContainerStyle={styles.pillsRow}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => setCategory(item)}>
+              <View style={[styles.pill, category === item && styles.pillActive]}>
+                <Text style={[styles.pillText, category === item && styles.pillTextActive]}>
+                  {item}
+                </Text>
+              </View>
+            </Pressable>
+          )}
+        />
+
+        <TrendingCarousel slides={TRENDING_SLIDES} onGenerate={handleGenerate} />
+
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>ALL SCENES</Text>
+          <Pressable onPress={() => setCategory('All')}>
+            <Text style={styles.seeAll}>See all</Text>
+          </Pressable>
+        </View>
+      </View>
+    ),
+    [category, generatedCount, handleGenerate, search]
+  );
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText
-          type="title"
-          style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+      <FlatList
+        data={filteredScenes}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={styles.gridRow}
+        contentContainerStyle={[styles.gridContent, { paddingBottom: insets.bottom + 120 }]}
+        refreshControl={<RefreshControl tintColor={Colors.accent} refreshing={refreshing} onRefresh={handleRefresh} />}
+        ListHeaderComponent={
+          <>
+            <View style={styles.headerRow}>
+              <Text style={styles.logo}>FlexMe</Text>
+              <Pressable onPress={handleAvatarPress} style={styles.avatarButton}>
+                {photoURL ? (
+                  <Image source={{ uri: photoURL }} style={styles.avatarImage} />
+                ) : (
+                  <Ionicons name="person" size={18} color={Colors.textPrimary} />
+                )}
+              </Pressable>
+            </View>
+            {renderHeader()}
+          </>
+        }
+        renderItem={({ item }) => <SceneCard scene={item} onPress={handleScenePress} />}
+      />
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
-  titleContainer: {
+  headerRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 16,
+  },
+  logo: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: Colors.textPrimary,
+  },
+  avatarButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.glassBg,
+    borderWidth: 0.5,
+    borderColor: Colors.glassBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 36,
+    height: 36,
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    paddingHorizontal: 16,
+    marginBottom: 14,
+  },
+  statChip: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    marginTop: 2,
+  },
+  searchBar: {
+    marginHorizontal: 16,
+    marginBottom: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
+    paddingVertical: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: Colors.textPrimary,
+    fontSize: 14,
+  },
+  pillsRow: {
+    paddingHorizontal: 16,
+    gap: 8,
+    marginBottom: 18,
+  },
+  pill: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
+    backgroundColor: Colors.glassBg,
+    borderWidth: 0.5,
+    borderColor: Colors.glassBorder,
+  },
+  pillActive: {
+    backgroundColor: Colors.textPrimary,
+  },
+  pillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.textMuted,
+  },
+  pillTextActive: {
+    color: '#08080c',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginTop: 24,
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: Colors.textPrimary,
+    letterSpacing: 1,
+  },
+  seeAll: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: Colors.accent,
+  },
+  gridContent: {
+    paddingHorizontal: 16,
+  },
+  gridRow: {
+    gap: 8,
+    marginBottom: 8,
   },
 });
