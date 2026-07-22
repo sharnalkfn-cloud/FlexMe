@@ -1,35 +1,32 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 const BASE_COLOR = '#0A0A10';
 
+// Exact CSS reference. react-native-web forwards unknown style keys like
+// backgroundImage straight to the DOM node, so on web we use this verbatim
+// instead of the SVG approximation below (which native platforms need,
+// since there's no CSS engine there).
+const WEB_BACKGROUND_IMAGE = [
+  'radial-gradient(ellipse 80% 35% at 50% 0%, rgba(100,210,50,0.35) 0%, transparent 70%)',
+  'radial-gradient(circle at 85% 25%, rgba(139,92,246,0.18) 0%, transparent 50%)',
+  'radial-gradient(circle at 10% 45%, rgba(59,130,246,0.14) 0%, transparent 45%)',
+  'radial-gradient(circle at 50% 60%, rgba(236,72,153,0.08) 0%, transparent 40%)',
+  'radial-gradient(circle at 20% 80%, rgba(20,184,166,0.10) 0%, transparent 42%)',
+  'radial-gradient(circle at 80% 75%, rgba(251,146,60,0.09) 0%, transparent 38%)',
+].join(', ');
+
 interface GlowStop {
   id: string;
-  /** Center position as a fraction (0-1) of screen width/height. */
   cxFrac: number;
   cyFrac: number;
-  /**
-   * Radius as a fraction of width/height. When omitted, the radius is
-   * computed as the distance from the center to the farthest screen
-   * corner (mirrors CSS radial-gradient's default `farthest-corner`
-   * sizing for a bare `circle at X% Y%`).
-   */
   rxFrac?: number;
   ryFrac?: number;
-  /** rgba(...) color at the gradient center. */
   color: [number, number, number, number];
-  /** Fraction (0-1) along the radius where the color fades to transparent. */
   transparentAt: number;
 }
 
-// Mirrors the CSS reference:
-//   radial-gradient(ellipse 80% 35% at 50% 0%, rgba(100,210,50,0.35) 0%, transparent 70%)
-//   radial-gradient(circle at 85% 25%, rgba(139,92,246,0.18) 0%, transparent 50%)
-//   radial-gradient(circle at 10% 45%, rgba(59,130,246,0.14) 0%, transparent 45%)
-//   radial-gradient(circle at 50% 60%, rgba(236,72,153,0.08) 0%, transparent 40%)
-//   radial-gradient(circle at 20% 80%, rgba(20,184,166,0.10) 0%, transparent 42%)
-//   radial-gradient(circle at 80% 75%, rgba(251,146,60,0.09) 0%, transparent 38%)
 const GLOWS: GlowStop[] = [
   { id: 'lime', cxFrac: 0.5, cyFrac: 0, rxFrac: 0.8, ryFrac: 0.35, color: [100, 210, 50, 0.35], transparentAt: 0.7 },
   { id: 'violet', cxFrac: 0.85, cyFrac: 0.25, color: [139, 92, 246, 0.18], transparentAt: 0.5 },
@@ -49,7 +46,7 @@ function farthestCornerDistance(cx: number, cy: number, width: number, height: n
   return Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
 }
 
-export function AppBackground() {
+function NativeAppBackground() {
   const { width, height } = useWindowDimensions();
 
   const glows = useMemo(() => {
@@ -95,6 +92,20 @@ export function AppBackground() {
       </Svg>
     </View>
   );
+}
+
+export function AppBackground() {
+  if (Platform.OS === 'web') {
+    return (
+      <View
+        style={[
+          StyleSheet.absoluteFillObject,
+          { backgroundColor: BASE_COLOR, backgroundImage: WEB_BACKGROUND_IMAGE } as never,
+        ]}
+      />
+    );
+  }
+  return <NativeAppBackground />;
 }
 
 export default AppBackground;
