@@ -7,6 +7,7 @@ import {
   Image,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -16,7 +17,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GlassCard } from '@/components/GlassCard';
-import { SceneCard } from '@/components/SceneCard';
+import { MasonrySceneCard } from '@/components/MasonrySceneCard';
 import { TrendingCarousel } from '@/components/TrendingCarousel';
 import { Colors } from '@/constants/colors';
 import {
@@ -30,6 +31,8 @@ import { getGenerationHistory } from '@/hooks/useGemini';
 import { onAuthStateChanged } from '@/services/firebase';
 
 const HISTORY_KEY = 'flexme_history';
+const MASONRY_MIN_HEIGHT = 150;
+const MASONRY_HEIGHT_RANGE = 90;
 
 function buildTrendingSlides() {
   return REAL_SCENES.slice(0, 5).map((scene, i) => ({
@@ -39,6 +42,39 @@ function buildTrendingSlides() {
 }
 
 const TRENDING_SLIDES = buildTrendingSlides();
+
+function hashSceneHeight(id: string): number {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  return MASONRY_MIN_HEIGHT + (hash % MASONRY_HEIGHT_RANGE);
+}
+
+interface MasonryItem {
+  scene: AnyScene;
+  height: number;
+}
+
+function buildMasonryColumns(scenes: AnyScene[]): { left: MasonryItem[]; right: MasonryItem[] } {
+  const left: MasonryItem[] = [];
+  const right: MasonryItem[] = [];
+  let leftHeight = 0;
+  let rightHeight = 0;
+
+  for (const scene of scenes) {
+    const item: MasonryItem = { scene, height: hashSceneHeight(scene.id) };
+    if (leftHeight <= rightHeight) {
+      left.push(item);
+      leftHeight += item.height;
+    } else {
+      right.push(item);
+      rightHeight += item.height;
+    }
+  }
+
+  return { left, right };
+}
 
 export default function ExploreScreen() {
   const router = useRouter();
@@ -79,6 +115,8 @@ export default function ExploreScreen() {
       return matchesCategory && matchesSearch;
     });
   }, [category, search]);
+
+  const masonryColumns = useMemo(() => buildMasonryColumns(filteredScenes), [filteredScenes]);
 
   const handleScenePress = useCallback(
     (scene: AnyScene) => {
@@ -161,30 +199,34 @@ export default function ExploreScreen() {
 
   return (
     <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
-      <FlatList
-        data={filteredScenes}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-        columnWrapperStyle={styles.gridRow}
-        contentContainerStyle={[styles.gridContent, { paddingBottom: insets.bottom + 120 }]}
-        refreshControl={<RefreshControl tintColor={Colors.accent} refreshing={refreshing} onRefresh={handleRefresh} />}
-        ListHeaderComponent={
-          <>
-            <View style={styles.headerRow}>
-              <Text style={styles.logo}>FlexMe</Text>
-              <Pressable onPress={handleAvatarPress} style={styles.avatarButton}>
-                {photoURL ? (
-                  <Image source={{ uri: photoURL }} style={styles.avatarImage} />
-                ) : (
-                  <Ionicons name="person" size={18} color={Colors.textPrimary} />
-                )}
-              </Pressable>
-            </View>
-            {renderHeader()}
-          </>
-        }
-        renderItem={({ item }) => <SceneCard scene={item} onPress={handleScenePress} />}
-      />
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: insets.bottom + 120 }}
+        refreshControl={<RefreshControl tintColor={Colors.accent} refreshing={refreshing} onRefresh={handleRefresh} />}>
+        <View style={styles.headerRow}>
+          <Text style={styles.logo}>FlexMe</Text>
+          <Pressable onPress={handleAvatarPress} style={styles.avatarButton}>
+            {photoURL ? (
+              <Image source={{ uri: photoURL }} style={styles.avatarImage} />
+            ) : (
+              <Ionicons name="person" size={18} color={Colors.textPrimary} />
+            )}
+          </Pressable>
+        </View>
+        {renderHeader()}
+
+        <View style={styles.masonryGrid}>
+          <View style={styles.masonryColumn}>
+            {masonryColumns.left.map(({ scene, height }) => (
+              <MasonrySceneCard key={scene.id} scene={scene} height={height} onPress={handleScenePress} />
+            ))}
+          </View>
+          <View style={styles.masonryColumn}>
+            {masonryColumns.right.map(({ scene, height }) => (
+              <MasonrySceneCard key={scene.id} scene={scene} height={height} onPress={handleScenePress} />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
     </Animated.View>
   );
 }
@@ -303,11 +345,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.accent,
   },
-  gridContent: {
+  masonryGrid: {
+    flexDirection: 'row',
+    gap: 8,
     paddingHorizontal: 16,
   },
-  gridRow: {
+  masonryColumn: {
+    flex: 1,
     gap: 8,
-    marginBottom: 8,
   },
 });
