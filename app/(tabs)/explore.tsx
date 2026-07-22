@@ -89,13 +89,13 @@ export default function ExploreScreen() {
 
   const handleGenerate = useCallback(
     (scene: AnyScene) => {
-      router.push({ pathname: '/(tabs)/generate', params: { sceneId: scene.id } });
+      router.push({ pathname: '/generate', params: { sceneId: scene.id } });
     },
     [router]
   );
 
   const handleAvatarPress = useCallback(() => {
-    router.push('/(tabs)/profile');
+    router.push('/profile');
   }, [router]);
 
   const renderHeader = useCallback(

@@ -32,7 +32,7 @@ export default function AuthScreen() {
   }, []);
 
   const goToTrial = useCallback(() => {
-    router.push('/(onboarding)/trial');
+    router.push('/trial');
   }, [router]);
 
   useEffect(() => {

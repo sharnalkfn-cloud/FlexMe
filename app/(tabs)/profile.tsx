@@ -68,7 +68,7 @@ export default function ProfileScreen() {
         style: 'destructive',
         onPress: async () => {
           await signOut();
-          router.replace('/(onboarding)/auth');
+          router.replace('/auth');
         },
       },
     ]);
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
             {subscriptionLabel}
           </Text>
           {!status.isActive && (
-            <Pressable style={styles.upgradeButton} onPress={() => router.push('/(onboarding)/trial')}>
+            <Pressable style={styles.upgradeButton} onPress={() => router.push('/trial')}>
               <Text style={styles.upgradeButtonText}>Upgrade</Text>
             </Pressable>
           )}
@@ -135,7 +135,7 @@ export default function ProfileScreen() {
             )}
             <Pressable
               style={styles.manageFacesButton}
-              onPress={() => router.push('/(onboarding)/face-scan')}>
+              onPress={() => router.push('/face-scan')}>
               <Text style={styles.manageFacesText}>Manage face photos</Text>
             </Pressable>
           </GlassCard>

@@ -19,7 +19,7 @@ export default function SceneDetailScreen() {
 
   const handleGenerate = useCallback(() => {
     if (!scene) return;
-    router.replace({ pathname: '/(tabs)/generate', params: { sceneId: scene.id } });
+    router.replace({ pathname: '/generate', params: { sceneId: scene.id } });
   }, [router, scene]);
 
   const handleClose = useCallback(() => {

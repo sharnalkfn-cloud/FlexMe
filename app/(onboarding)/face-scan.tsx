@@ -30,7 +30,7 @@ export default function FaceScanScreen() {
   );
 
   const handleContinue = useCallback(() => {
-    router.push('/(onboarding)/auth');
+    router.push('/auth');
   }, [router]);
 
   const progressText = useMemo(

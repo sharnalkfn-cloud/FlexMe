@@ -23,7 +23,7 @@ export default function SplashScreen() {
     taglineOpacity.value = withDelay(400, withTiming(1, { duration: 600 }));
 
     const timer = setTimeout(() => {
-      router.replace('/(onboarding)/welcome');
+      router.replace('/welcome');
     }, 2500);
 
     return () => clearTimeout(timer);

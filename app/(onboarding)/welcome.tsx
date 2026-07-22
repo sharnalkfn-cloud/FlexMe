@@ -60,11 +60,11 @@ export default function WelcomeScreen() {
   }, []);
 
   const handleSkip = useCallback(() => {
-    router.push('/(onboarding)/face-scan');
+    router.push('/face-scan');
   }, [router]);
 
   const handleGetStarted = useCallback(() => {
-    router.push('/(onboarding)/face-scan');
+    router.push('/face-scan');
   }, [router]);
 
   return (

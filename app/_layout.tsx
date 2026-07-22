@@ -34,11 +34,11 @@ export default function RootLayout() {
     hasNavigated.current = true;
 
     if (!onboardingComplete) {
-      router.replace('/(onboarding)/index');
+      router.replace('/');
     } else if (authState === 'signed-out') {
-      router.replace('/(onboarding)/auth');
+      router.replace('/auth');
     } else {
-      router.replace('/(tabs)/explore');
+      router.replace('/explore');
     }
   }, [authState, onboardingComplete, router, segments]);
 
