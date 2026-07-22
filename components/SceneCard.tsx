@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { memo, useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -8,6 +8,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { Colors, Gradients, Radius } from '@/constants/colors';
+import { getSceneImageSource } from '@/constants/sceneImages';
 import type { AnyScene } from '@/constants/scenes';
 
 interface SceneCardProps {
@@ -51,6 +52,8 @@ function SceneCardComponent({ scene, onPress, width, height = 150 }: SceneCardPr
     onPress(scene);
   }, [onPress, scene]);
 
+  const imageSource = getSceneImageSource(scene.id);
+
   return (
     <AnimatedPressable
       onPress={handlePress}
@@ -67,9 +70,13 @@ function SceneCardComponent({ scene, onPress, width, height = 150 }: SceneCardPr
             <Text style={styles.badgeText}>{scene.badge}</Text>
           </View>
         )}
-        <View style={styles.emojiWrap}>
-          <Text style={styles.emoji}>{scene.emoji}</Text>
-        </View>
+        {imageSource ? (
+          <Image source={imageSource} style={styles.image} resizeMode="cover" />
+        ) : (
+          <View style={styles.emojiWrap}>
+            <Text style={styles.emoji}>{scene.emoji}</Text>
+          </View>
+        )}
         <LinearGradient colors={Gradients.cardOverlay} style={styles.overlay}>
           <Text style={styles.name} numberOfLines={1}>
             {scene.name}
@@ -121,6 +128,9 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 40,
+  },
+  image: {
+    ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     paddingHorizontal: 10,

@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { memo, useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { Colors, Gradients, Radius } from '@/constants/colors';
+import { getSceneImageSource } from '@/constants/sceneImages';
 import type { AnyScene } from '@/constants/scenes';
 
 interface MasonrySceneCardProps {
@@ -53,6 +54,7 @@ function MasonrySceneCardComponent({ scene, height, onPress }: MasonrySceneCardP
 
   const likes = Math.round(scene.views * 0.045);
   const comments = Math.round(scene.views * 0.012);
+  const imageSource = getSceneImageSource(scene.id);
 
   return (
     <AnimatedPressable
@@ -70,9 +72,13 @@ function MasonrySceneCardComponent({ scene, height, onPress }: MasonrySceneCardP
             <Text style={styles.badgeText}>{scene.badge}</Text>
           </View>
         )}
-        <View style={styles.emojiWrap}>
-          <Text style={styles.emoji}>{scene.emoji}</Text>
-        </View>
+        {imageSource ? (
+          <Image source={imageSource} style={styles.image} resizeMode="cover" />
+        ) : (
+          <View style={styles.emojiWrap}>
+            <Text style={styles.emoji}>{scene.emoji}</Text>
+          </View>
+        )}
         <LinearGradient colors={Gradients.cardOverlay} style={styles.overlay}>
           <View style={styles.statsRow}>
             <View style={styles.statPill}>
@@ -128,6 +134,9 @@ const styles = StyleSheet.create({
   },
   emoji: {
     fontSize: 40,
+  },
+  image: {
+    ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     paddingHorizontal: 10,

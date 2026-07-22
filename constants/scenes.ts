@@ -12,6 +12,13 @@ export interface RealScene {
   description: string;
   outfitDetails: string;
   prompt: string;
+  /**
+   * Documented path of the manually-provided reference image for this scene
+   * (see docs/SCENES_README.md). Not resolved dynamically — an entry must
+   * also be added to constants/sceneImages.ts once the file actually exists,
+   * since Metro requires static require() paths.
+   */
+  exampleImage?: string;
 }
 
 export interface ExtraScene {
@@ -168,6 +175,88 @@ export const REAL_SCENES: RealScene[] = [
       'Place the subject standing beside a Ferrari Roma Spider on an open plaza in Downtown Dubai at night, the fully illuminated Burj Khalifa rising directly behind. The subject wears a tailored Brunello Cucinelli blazer and a Patek Philippe Calatrava watch. Old-money elegance, warm architectural up-lighting, cinematic symmetrical composition.'
     ),
   },
+  // --- The 5 scenes below use exact, unedited prompts supplied by the
+  // project owner (see docs/PROMPTS.md) and do not use PROMPT_HEADER/FOOTER. ---
+  {
+    id: 'lamborghini_pov',
+    emoji: '🏎️',
+    name: 'Lamborghini Driving POV',
+    location: 'Downtown Dubai',
+    category: 'Luxury',
+    bgColors: ['#101014', '#050506'],
+    badge: 'HOT',
+    views: 87400,
+    description:
+      'An unplanned, handheld-style shot from the driver seat of a matte black Lamborghini Huracán Evo at a red light in Downtown Dubai, luxury shopping bags visible on the passenger seat.',
+    outfitDetails: 'Fitted black t-shirt, black tailored trousers, Audemars Piguet Royal Oak Offshore.',
+    exampleImage: '/scenes/lamborghini-pov.jpg',
+    prompt:
+      'Use the uploaded reference image for the male subject. The facial identity must be reproduced 1:1 with absolutely no changes to bone structure, facial proportions, skin tone, hairline, facial hair density, or overall appearance. No beautification. No smoothing. No substitutions. Natural skin texture preserved. A completely unplanned vertical iPhone photo (9:16) taken from the passenger seat of a Lamborghini Huracán Evo at night in Downtown Dubai. Slight handheld tilt. Slight imperfect framing. Not centered. Looks like someone casually snapped it mid-drive at a red light. Exact car: Lamborghini Huracán Evo (matte black exterior, black Alcantara interior with contrast stitching, correct dashboard structure, no duplicated doors, correct single door per side). Camera angle: Shot from slightly above center console height. Driver clearly visible. Passenger seat partially visible with shopping bags. The male subject is in the driver seat, one hand resting loosely on the steering wheel, the other hand holding his phone mid-scroll. He is slightly smiling at the screen — subtle, confident, not exaggerated. Eyes focused on phone. Not looking at camera. Outfit: Fitted black short-sleeve t-shirt stretched across chest Black tailored trousers Luxury watch clearly visible (Audemars Piguet Royal Oak Offshore, accurate proportions) Natural brown arm hair visible No AirPods Passenger seat: Clearly visible luxury shopping bags casually placed, not staged. Brands must be readable and correct: Louis Vuitton (brown monogram bag) Dior (white bag with black logo) Chanel (black bag with white lettering) Apple Store bag (white with logo) Bags slightly leaning due to car movement. Not perfectly arranged. Handles slightly twisted. Natural placement. Interior details: Correct Lamborghini steering wheel with centered bull emblem Digital cluster visible but not glowing unnaturally Center console buttons correct Alcantara texture visible No extra panels No duplicate doors Outside the windshield: Downtown Dubai at night. Burj Khalifa visible in the distance but slightly off to the side. Traffic lights reflecting on windshield. Other cars slightly blurred from shallow focus. Warm street lighting reflecting on dashboard. Lighting: Mixed city light + dashboard glow. Uneven exposure. Soft light on face from phone screen. Mild iPhone night grain. Natural skin tone. No cinematic color grading. The image should feel like: Red light stop. Phone buzz. Bags on seat. Engine humming. City glowing. Low-key flex. Unplanned. Real.',
+  },
+  {
+    id: 'dubai_jetski',
+    emoji: '🛥️',
+    name: 'Dubai Jetski',
+    location: 'Dubai Marina',
+    category: 'Luxury',
+    bgColors: ['#0a1420', '#04070c'],
+    badge: 'NEW',
+    views: 52100,
+    description:
+      'Standing on a jet ski on calm night water with a superyacht and the Dubai skyline glowing behind, captured spontaneously from a nearby jet ski.',
+    outfitDetails: 'Swim shorts only, natural physique, no accessories.',
+    exampleImage: '/scenes/dubai-jetski.jpg',
+    prompt:
+      'Use the uploaded reference image for the male subject. The facial identity must be reproduced 1:1 with absolutely no changes to bone structure, facial proportions, skin tone, hairline, facial hair density, or overall appearance. No beautification. No smoothing. No substitutions. Natural skin texture preserved. A completely unplanned vertical iPhone photo (9:16) captured at night from another jet ski floating on calm water. Slight handheld instability. Slight tilt. Not centered. Slight digital grain from low light. Looks like a friend quickly lifted the phone to capture the moment. Distance composition: The camera is approximately 6–7 meters away from the subject. The male subject is standing upright on a black jet ski floating still on the water. Roughly 15 meters behind him there is a large luxury superyacht with full exterior lights on. Further in the distance, the Dubai skyline is clearly visible, including recognizable skyscraper silhouettes glowing in the night air. The subject is wearing only fitted swim shorts. Upper body completely visible. Face clearly visible. He is balanced confidently on the jet ski seat platform. One arm relaxed at his side. The other hand raised slightly outward making a clear hand gesture. Not exaggerated. Natural. Casual. Slight confident expression. Physique: Thick chest. Broad shoulders. Full arms. Visible abdominal definition. Strong quad structure. Natural muscle density — not exaggerated. Slight sheen from ocean water reflection. Environment details: Calm dark water with subtle reflections from yacht lights. Small ripples around the jet ski. The yacht behind has multiple deck levels illuminated with warm white lighting. Interior cabin glow visible. Soft blue and gold city lights from Dubai skyline reflecting across the water surface. Very slight humidity haze in the air. Jet ski details: Modern performance jet ski. Gloss black body. Handlebars visible. Front nose slightly angled toward camera. No distortion of proportions. Lighting: Mixed yacht light + city skyline glow. Uneven exposure typical of iPhone night shot. Slight grain. No spotlight effect. No cinematic grading. Realistic night contrast. The image should feel like: Late Dubai night. Water still. Engine off. Yacht behind. City glowing. Captured spontaneously. Real presence.',
+  },
+  {
+    id: 'dubai_shopping_lambo',
+    emoji: '🛍️',
+    name: 'Dubai Shopping Bags in Lamborghini',
+    location: 'Dubai Mall',
+    category: 'Luxury',
+    bgColors: ['#1c1408', '#08050a'],
+    badge: 'HOT',
+    views: 63800,
+    description:
+      'A wide, casual interior shot inside a Lamborghini Aventador SVJ parked outside Dubai Mall at night, luxury shopping bags on the passenger seat and floor.',
+    outfitDetails: 'Rolex Daytona, luxury shopping bags (Louis Vuitton, Dior, Gucci).',
+    exampleImage: '/scenes/dubai-shopping-lambo.jpg',
+    prompt:
+      'Use the uploaded reference image for the male subject. The facial identity must be reproduced exactly 1:1 with no changes to bone structure, facial proportions, skin tone, hairline, facial hair, or natural expression. No beautification. No smoothing. No substitutions. A natural, unplanned first-person vertical iPhone photo (9:16) captured while seated inside a Lamborghini Aventador SVJ parked outside Dubai Mall at night. The camera must be positioned slightly farther from the wrist than a typical close-up. The framing should capture a wide interior view — full steering wheel, most of the dashboard, center console, part of the passenger seat, and visible exterior environment through both the windshield and open scissor door. The wrist should not dominate the frame. The watch must be visible but not zoomed-in. Exact car: Lamborghini Aventador SVJ (correct hexagonal air vents, accurate digital cluster shape, exposed carbon fiber trim aligned properly, correct scissor door hinge mechanism with only the driver-side door open). No warped geometry. On the passenger seat and extending into the footwell are multiple luxury shopping bags: Louis Vuitton (monogram accurate) Dior (white bag, centered logo) Gucci (cream bag with green-red stripe detail) The bags should be clearly visible within the wider composition, not cropped out. They must sit naturally with slight wrinkles and imperfect handle positioning. The subject\'s left hand rests casually on the upper-left quadrant of the steering wheel. A Rolex Daytona (black dial, ceramic bezel) is visible but proportionally smaller within the frame due to the wider camera distance. Natural brown to light-brown wrist hair visible. The right hand holds the phone mid-scroll. The subject is actively looking at the phone screen. Outside the vehicle: Dubai Mall façade lighting Palm trees with warm uplighting Valet stand and cones Luxury vehicles parked nearby Faint Burj Khalifa lights visible in distance The scissor door is open upward, allowing more exterior lighting to spill into the cabin. Mixed lighting creates uneven highlights across the interior surfaces and subtle reflections on the watch crystal. Slight exposure imbalance between bright mall lights and darker interior. Mild smartphone grain consistent with low-light capture. Important: The composition must feel wide and environmental, not cropped tight. The interior, shopping bags, and exterior surroundings must all be clearly visible in a single balanced frame. No cinematic lighting. No artificial glow. No macro wrist close-up. No UI overlays. No symmetry correction. No AirPods or earbuds. The image must feel like the subject casually lifted his phone to capture the entire scene — not a close-up watch advertisement.',
+  },
+  {
+    id: 'girlfriend_jet_bugatti',
+    emoji: '✈️',
+    name: 'Girlfriend, Private Jet and Bugatti',
+    location: 'Private Airport',
+    category: 'Jets',
+    bgColors: ['#0d1420', '#05070c'],
+    badge: 'PRO',
+    views: 71200,
+    description:
+      'A private airport runway at night with a Gulfstream G700 and a two-tone Bugatti Chiron Sport, the subject standing between them with a companion close by his side.',
+    outfitDetails: 'Balmain t-shirt, Dior B27 sneakers, Patek Philippe Nautilus.',
+    exampleImage: '/scenes/girlfriend-jet-bugatti.jpg',
+    prompt:
+      'Use the uploaded reference image for the male subject. Match his facial structure, proportions, skin tone, hairline, facial hair, and overall appearance naturally and accurately. No beautification. No substitutions. Generate a highly realistic vertical iPhone photo (9:16) captured casually for Instagram Stories or TikTok slideshow. Slight handheld tilt. Imperfect framing like it was snapped quickly during movement. Location: Private airport runway at night. A large Gulfstream G700 jet parked behind with cabin lights glowing. Runway lights stretching into the distance. Exact car: Bugatti Chiron Sport (gloss black and deep blue two-tone exterior, signature C-shaped side profile correctly proportioned, black wheels). Correct factory proportions. Driver-side door open normally. Passenger side closed. The Chiron is parked directly in front of the jet stairs. Real runway texture. Slight reflection from runway lights on the paint. The male subject is standing between the open Bugatti door and the lowered jet stairs. Upper body fully visible. One hand holding his phone mid-scroll. Eyes locked on the screen. Calm expression despite chaos around him. A generated woman is extremely close to him, standing on his side and leaning into his shoulder slightly. One hand resting lightly on his chest. She is looking toward him, not at the camera. Her outfit matches runway luxury: Fitted black tailored blazer dress High designer heels Sleek straight hair Subtle diamond earrings catching runway lights Outfit (male): Black fitted Balmain t-shirt Dark tailored trousers White Dior B27 sneakers Patek Philippe Nautilus stainless steel Natural brown arm hair visible No AirPods Behind them, the jet engines are beginning to spool slightly, creating visible wind movement in clothing and hair. Not exaggerated — just enough motion to create energy. Slight blur from runway lights in distance. Interior visible through open door: Bugatti steering wheel with correct emblem Luxury leather interior with blue stitching Digital cluster visible naturally Lighting: Mixed runway floodlights and jet cabin glow. Uneven smartphone exposure. Slight grain. Real reflections across body panels. Subtle motion blur from wind. The image should feel like: Runway wind. Jet ready. Bugatti door open. Phone check. She close. Engines humming. Untouchable.',
+  },
+  {
+    id: 'highrise_pool',
+    emoji: '🏊',
+    name: 'High-Rise Pool Relax',
+    location: 'Miami',
+    category: 'Lifestyle',
+    bgColors: ['#1a2818', '#08100a'],
+    badge: 'NEW',
+    views: 44900,
+    description:
+      'Standing at the edge of a Miami high-rise rooftop infinity pool during golden hour, drink in hand, skyline in the distance.',
+    outfitDetails: 'Louis Vuitton or Dior swim shorts, sunglasses.',
+    exampleImage: '/scenes/highrise-pool.jpg',
+    prompt:
+      'Use the uploaded reference image for the male subject. The facial identity must be reproduced 1:1 with absolutely no changes to bone structure, facial proportions, skin tone, hairline, facial hair density, or overall appearance. No beautification. No smoothing. No substitutions. Natural skin texture preserved. A completely unplanned vertical iPhone photo (9:16) captured on a Miami high-rise rooftop pool during late afternoon golden hour. Slight handheld tilt. Slight imperfect framing. Looks like someone in the pool quickly lifted the phone to capture the moment. Not centered. Slight motion blur from movement. Camera distance: Approximately 2–3 meters away from the subject. The male subject is standing at the edge of the rooftop infinity pool, one foot slightly in the water. Upper body fully visible. Face clearly visible. He is holding a short glass with ice (clear drink) in one hand while casually adjusting his sunglasses with the other. Not looking at camera — eyes slightly toward the skyline. Natural expression. Physique: Thick chest. Broad shoulders. Full arms with natural vascularity. Clear abdominal definition. Strong quad structure visible. Natural summer tan. Slight water droplets on lower legs. Outfit: Luxury fitted swim shorts (Louis Vuitton or Dior — correct monogram placement).',
+  },
 ];
 
 const CATEGORIES = ['Luxury', 'Dubai', 'Europe', 'Jets', 'Nature', 'Night', 'Custom'] as const;
@@ -240,7 +329,17 @@ export type AnyScene = RealScene | ExtraScene;
 
 export const ALL_SCENES: AnyScene[] = [...REAL_SCENES, ...EXTRA_SCENES];
 
-export const FILTER_CATEGORIES = ['All', 'Luxury', 'Dubai', 'Europe', 'Jets', 'Nature', 'Night', 'Custom'] as const;
+export const FILTER_CATEGORIES = [
+  'All',
+  'Luxury',
+  'Dubai',
+  'Europe',
+  'Jets',
+  'Nature',
+  'Night',
+  'Lifestyle',
+  'Custom',
+] as const;
 
 export function getSceneById(id: string): AnyScene | undefined {
   return ALL_SCENES.find((s) => s.id === id);
