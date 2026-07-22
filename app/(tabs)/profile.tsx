@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import type { User } from 'firebase/auth';
-import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
@@ -33,10 +33,9 @@ const SETTINGS_ITEMS = [
 ];
 
 export default function ProfileScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { faces } = useFaces();
-  const { status } = useSubscription();
+  const { faces, addFace } = useFaces();
+  const { status, purchasing, startTrial } = useSubscription();
   const [user, setUser] = useState<User | null>(null);
   const [generatedCount, setGeneratedCount] = useState(0);
   const [publicFeed, setPublicFeed] = useState(false);
@@ -68,11 +67,33 @@ export default function ProfileScreen() {
         style: 'destructive',
         onPress: async () => {
           await signOut();
-          router.replace('/auth');
         },
       },
     ]);
-  }, [router]);
+  }, []);
+
+  const handleUpgrade = useCallback(() => {
+    startTrial();
+  }, [startTrial]);
+
+  const handleManageFaces = useCallback(async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) return;
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      base64: true,
+      quality: 0.8,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+    if (!result.canceled && result.assets[0]?.base64) {
+      await addFace({
+        uri: result.assets[0].uri,
+        base64: result.assets[0].base64,
+        angle: 'Front',
+      });
+    }
+  }, [addFace]);
 
   const subscriptionLabel = status.isActive
     ? status.isTrial
@@ -115,8 +136,8 @@ export default function ProfileScreen() {
             {subscriptionLabel}
           </Text>
           {!status.isActive && (
-            <Pressable style={styles.upgradeButton} onPress={() => router.push('/trial')}>
-              <Text style={styles.upgradeButtonText}>Upgrade</Text>
+            <Pressable style={styles.upgradeButton} onPress={handleUpgrade} disabled={purchasing}>
+              <Text style={styles.upgradeButtonText}>{purchasing ? 'Please wait…' : 'Upgrade'}</Text>
             </Pressable>
           )}
         </GlassCard>
@@ -133,10 +154,8 @@ export default function ProfileScreen() {
                 ))}
               </View>
             )}
-            <Pressable
-              style={styles.manageFacesButton}
-              onPress={() => router.push('/face-scan')}>
-              <Text style={styles.manageFacesText}>Manage face photos</Text>
+            <Pressable style={styles.manageFacesButton} onPress={handleManageFaces}>
+              <Text style={styles.manageFacesText}>Add face photo</Text>
             </Pressable>
           </GlassCard>
         </View>
