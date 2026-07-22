@@ -94,7 +94,7 @@ export default function SceneDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: 'transparent',
   },
   notFound: {
     color: Colors.textPrimary,

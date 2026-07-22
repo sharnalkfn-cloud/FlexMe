@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "flexme",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#060810",
+    "backgroundColor": "#0A0A10",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
@@ -22,7 +22,7 @@
     "android": {
       "package": "com.flexme.app",
       "adaptiveIcon": {
-        "backgroundColor": "#060810",
+        "backgroundColor": "#0A0A10",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -42,9 +42,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#060810",
+          "backgroundColor": "#0A0A10",
           "dark": {
-            "backgroundColor": "#060810"
+            "backgroundColor": "#0A0A10"
           }
         }
       ],

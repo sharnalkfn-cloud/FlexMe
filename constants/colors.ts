@@ -1,5 +1,5 @@
 export const Colors = {
-  background: '#060810',
+  background: '#0A0A10',
   glassBg: 'rgba(255,255,255,0.05)',
   glassBorder: 'rgba(255,255,255,0.08)',
   accent: '#dceeff',
