@@ -1,22 +1,27 @@
-import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BlurView } from 'expo-blur';
+import * as Haptics from 'expo-haptics';
 import React, { useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, Radius } from '@/constants/colors';
-
 const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   explore: 'compass',
   generate: 'sparkles',
   history: 'time',
   profile: 'person',
+};
+
+const TAB_ICONS_OUTLINE: Record<string, keyof typeof Ionicons.glyphMap> = {
+  explore: 'compass-outline',
+  generate: 'sparkles-outline',
+  history: 'time-outline',
+  profile: 'person-outline',
 };
 
 const TAB_LABELS: Record<string, string> = {
@@ -35,30 +40,29 @@ function TabItem({
   focused: boolean;
   onPress: () => void;
 }) {
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: withSpring(focused ? 1 : 0.94, { damping: 14 }) }],
+  const activeBgStyle = useAnimatedStyle(() => ({
+    opacity: withSpring(focused ? 1 : 0, { stiffness: 400, damping: 28 }),
+    transform: [{ scale: withSpring(focused ? 1 : 0.8, { stiffness: 400, damping: 28 }) }],
   }));
 
-  const iconName = TAB_ICONS[routeName] ?? 'ellipse';
+  const iconStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: withSpring(focused ? 1.08 : 1, { stiffness: 460, damping: 22 }) },
+      { translateY: withSpring(focused ? -1 : 0, { stiffness: 460, damping: 22 }) },
+    ],
+  }));
+
+  const iconName = (focused ? TAB_ICONS[routeName] : TAB_ICONS_OUTLINE[routeName]) ?? 'ellipse';
 
   return (
-    <Pressable onPress={onPress} style={styles.tabPressable}>
-      <Animated.View
-        style={[
-          styles.tabItem,
-          animatedStyle,
-          focused ? styles.tabItemActive : null,
-        ]}>
+    <Pressable onPress={onPress} style={styles.tabButton} accessibilityLabel={TAB_LABELS[routeName] ?? routeName}>
+      <Animated.View style={[styles.activeBg, activeBgStyle]} />
+      <Animated.View style={iconStyle}>
         <Ionicons
           name={iconName}
-          size={18}
-          color={focused ? '#08080c' : Colors.textPrimary}
+          size={20}
+          color={focused ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.48)'}
         />
-        {focused && (
-          <Text style={styles.tabLabel} numberOfLines={1}>
-            {TAB_LABELS[routeName] ?? routeName}
-          </Text>
-        )}
       </Animated.View>
     </Pressable>
   );
@@ -69,7 +73,7 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
 
   const handlePress = useCallback(
     (routeName: string, index: number) => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      Haptics.selectionAsync();
       const isFocused = state.index === index;
       if (!isFocused) {
         navigation.navigate(routeName);
@@ -79,9 +83,9 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
   );
 
   return (
-    <View style={[styles.container, { bottom: insets.bottom + 32 }]} pointerEvents="box-none">
+    <View style={[styles.container, { bottom: insets.bottom + 14 }]} pointerEvents="box-none">
       <View style={styles.pillWrapper}>
-        <BlurView tint="dark" intensity={60} style={StyleSheet.absoluteFillObject} />
+        <BlurView tint="dark" intensity={80} style={StyleSheet.absoluteFillObject} />
         <View style={styles.row}>
           {state.routes.map((route, index) => (
             <TabItem
@@ -105,35 +109,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pillWrapper: {
-    borderRadius: Radius.pill,
+    borderRadius: 18,
     overflow: 'hidden',
-    backgroundColor: Colors.glassBg,
-    borderWidth: 0.5,
-    borderColor: Colors.glassBorder,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.5,
+        shadowRadius: 24,
+      },
+      android: {
+        elevation: 12,
+      },
+    }),
   },
   row: {
     flexDirection: 'row',
-    paddingHorizontal: 6,
-    paddingVertical: 6,
-  },
-  tabPressable: {
-    marginHorizontal: 2,
-  },
-  tabItem: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 14,
+    paddingHorizontal: 13,
     paddingVertical: 10,
-    borderRadius: Radius.pill,
   },
-  tabItemActive: {
-    backgroundColor: Colors.textPrimary,
+  tabButton: {
+    width: 54,
+    height: 44,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  tabLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#08080c',
+  activeBg: {
+    position: 'absolute',
+    top: 0,
+    left: 4,
+    right: 4,
+    bottom: 0,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
   },
 });
 
