@@ -60,7 +60,9 @@ export default function GalerieScreen() {
       <AppBackground />
       <View style={styles.header}>
         <Text style={styles.title}>Galerie</Text>
-        <Text style={styles.subtitle}>{history.length} photos générées</Text>
+        <Text style={styles.subtitle}>
+          {history.length === 0 ? 'No photos yet' : `${history.length} photos générées`}
+        </Text>
       </View>
 
       <FlatList
@@ -71,13 +73,19 @@ export default function GalerieScreen() {
         contentContainerStyle={[styles.gridContent, { paddingBottom: insets.bottom + 140 }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Ionicons name="images-outline" size={40} color={Colors.textMuted} />
+            <View style={styles.emptyIconWrap}>
+              <Ionicons name="images-outline" size={26} color={Colors.textMuted} />
+            </View>
             <Text style={styles.emptyText}>Génère ta première photo</Text>
           </View>
         }
         renderItem={({ item }) => (
           <Pressable
-            style={[styles.item, { height: itemHeight }]}
+            style={({ pressed }) => [
+              styles.item,
+              { height: itemHeight },
+              pressed && styles.itemPressed,
+            ]}
             onLongPress={() => handleLongPress(item)}>
             <Image
               source={{ uri: `data:image/jpeg;base64,${item.imageBase64}` }}
@@ -124,6 +132,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     backgroundColor: Colors.surface,
+    borderWidth: 0.5,
+    borderColor: Colors.border,
+  },
+  itemPressed: {
+    opacity: 0.75,
   },
   itemImage: {
     width: '100%',
@@ -136,7 +149,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 100,
-    gap: 12,
+    gap: 14,
+  },
+  emptyIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   emptyText: {
     fontSize: 14,

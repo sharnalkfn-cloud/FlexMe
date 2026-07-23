@@ -49,24 +49,41 @@ export default function SnapScreen() {
           <FaceCapture onCapture={handleCapture} />
         </View>
 
-        <Pressable style={styles.uploadButton} onPress={handleUploadFromLibrary}>
+        <Pressable
+          style={({ pressed }) => [styles.uploadButton, pressed && styles.uploadButtonPressed]}
+          onPress={handleUploadFromLibrary}>
           <Ionicons name="images-outline" size={18} color={Colors.textPrimary} />
           <Text style={styles.uploadButtonText}>Upload from library</Text>
         </Pressable>
 
-        {faces.length > 0 && (
-          <View style={styles.facesSection}>
-            <Text style={styles.facesTitle}>Your faces ({faces.length})</Text>
-            <View style={styles.faceGrid}>
-              {faces.map((face, i) => (
-                <Pressable key={`${face.uri}-${i}`} onLongPress={() => removeFace(i)}>
-                  <Image source={{ uri: face.uri }} style={styles.faceThumb} />
-                </Pressable>
-              ))}
-            </View>
-            <Text style={styles.faceHint}>Long-press a photo to remove it.</Text>
+        <View style={styles.facesSection}>
+          <View style={styles.facesHeaderRow}>
+            <Text style={styles.facesTitle}>Your faces</Text>
+            {faces.length > 0 && (
+              <View style={styles.facesCountPill}>
+                <Text style={styles.facesCountText}>{faces.length}</Text>
+              </View>
+            )}
           </View>
-        )}
+
+          {faces.length > 0 ? (
+            <>
+              <View style={styles.faceGrid}>
+                {faces.map((face, i) => (
+                  <Pressable key={`${face.uri}-${i}`} onLongPress={() => removeFace(i)} style={styles.faceThumbWrap}>
+                    <Image source={{ uri: face.uri }} style={styles.faceThumb} />
+                  </Pressable>
+                ))}
+              </View>
+              <Text style={styles.faceHint}>Long-press a photo to remove it.</Text>
+            </>
+          ) : (
+            <View style={styles.facesEmpty}>
+              <Ionicons name="person-outline" size={20} color={Colors.textMuted} />
+              <Text style={styles.facesEmptyText}>No faces added yet</Text>
+            </View>
+          )}
+        </View>
       </ScrollView>
     </Animated.View>
   );
@@ -79,8 +96,8 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 8,
-    marginBottom: 16,
+    paddingTop: 10,
+    marginBottom: 20,
   },
   title: {
     fontSize: 24,
@@ -90,7 +107,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: Colors.textMuted,
-    marginTop: 4,
+    marginTop: 5,
   },
   captureWrap: {
     paddingHorizontal: 20,
@@ -108,25 +125,52 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.border,
   },
+  uploadButtonPressed: {
+    opacity: 0.7,
+  },
   uploadButtonText: {
     fontSize: 14,
     fontWeight: '700',
     color: Colors.textPrimary,
   },
   facesSection: {
-    marginTop: 24,
+    marginTop: 28,
     paddingHorizontal: 20,
+  },
+  facesHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 14,
   },
   facesTitle: {
     fontSize: 14,
     fontWeight: '800',
     color: Colors.textPrimary,
-    marginBottom: 12,
+  },
+  facesCountPill: {
+    minWidth: 20,
+    height: 20,
+    paddingHorizontal: 6,
+    borderRadius: 10,
+    backgroundColor: Colors.surfaceRaised,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  facesCountText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textMuted,
   },
   faceGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
+  },
+  faceThumbWrap: {
+    borderRadius: 34,
   },
   faceThumb: {
     width: 64,
@@ -138,6 +182,21 @@ const styles = StyleSheet.create({
   faceHint: {
     fontSize: 11,
     color: Colors.textFaint,
-    marginTop: 10,
+    marginTop: 12,
+  },
+  facesEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: Radius.card,
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  facesEmptyText: {
+    fontSize: 13,
+    color: Colors.textMuted,
   },
 });

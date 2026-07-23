@@ -9,6 +9,7 @@ export const Colors = {
   accent: '#6C5CE7',
   accentDark: '#3B2FA0',
   gold: '#F0B429',
+  danger: '#FF6B6B',
   textPrimary: '#FFFFFF',
   textMuted: 'rgba(255,255,255,0.45)',
   textFaint: 'rgba(255,255,255,0.28)',

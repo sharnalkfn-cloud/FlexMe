@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import React, { useCallback } from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -11,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, Gradients } from '@/constants/colors';
+import { Colors } from '@/constants/colors';
 
 const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   snap: 'camera-outline',
@@ -35,10 +34,13 @@ function SideTab({
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} style={styles.sideTab} accessibilityLabel={TAB_LABELS[routeName]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.sideTab, pressed && styles.sideTabPressed]}
+      accessibilityLabel={TAB_LABELS[routeName]}>
       <Ionicons
         name={TAB_ICONS[routeName] ?? 'ellipse-outline'}
-        size={22}
+        size={20}
         color={focused ? Colors.textPrimary : Colors.textMuted}
       />
       <Text style={[styles.sideTabLabel, focused && styles.sideTabLabelActive]}>
@@ -67,7 +69,7 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
   );
 
   const handleCenterPressIn = useCallback(() => {
-    centerScale.value = withSpring(0.9, { stiffness: 500, damping: 20 });
+    centerScale.value = withSpring(0.92, { stiffness: 500, damping: 20 });
   }, [centerScale]);
 
   const handleCenterPressOut = useCallback(() => {
@@ -77,6 +79,7 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
   const snapIndex = state.routes.findIndex((r) => r.name === 'snap');
   const studioIndex = state.routes.findIndex((r) => r.name === 'studio');
   const galerieIndex = state.routes.findIndex((r) => r.name === 'galerie');
+  const studioFocused = state.index === studioIndex;
 
   return (
     <View style={[styles.container, { bottom: insets.bottom + 12 }]} pointerEvents="box-none">
@@ -87,17 +90,17 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
           onPress={() => handlePress('snap', snapIndex)}
         />
 
-        <View style={styles.centerSlot}>
-          <AnimatedPressable
-            onPress={() => handlePress('studio', studioIndex)}
-            onPressIn={handleCenterPressIn}
-            onPressOut={handleCenterPressOut}
-            style={[styles.centerButton, centerStyle]}
-            accessibilityLabel="Studio">
-            <LinearGradient colors={Gradients.accent} style={StyleSheet.absoluteFillObject} />
-            <Ionicons name="sparkles" size={24} color="#fff" />
-          </AnimatedPressable>
-        </View>
+        <AnimatedPressable
+          onPress={() => handlePress('studio', studioIndex)}
+          onPressIn={handleCenterPressIn}
+          onPressOut={handleCenterPressOut}
+          style={[styles.centerTab, centerStyle]}
+          accessibilityLabel="Générer">
+          <View style={[styles.centerIconWrap, studioFocused && styles.centerIconWrapActive]}>
+            <Ionicons name="sparkles" size={18} color={studioFocused ? '#fff' : Colors.accent} />
+          </View>
+          <Text style={[styles.sideTabLabel, studioFocused && styles.sideTabLabelActive]}>Générer</Text>
+        </AnimatedPressable>
 
         <SideTab
           routeName="galerie"
@@ -112,24 +115,24 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: 0,
-    right: 0,
+    left: 20,
+    right: 20,
     alignItems: 'center',
   },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: 260,
-    height: 64,
-    borderRadius: 32,
+    width: '100%',
+    height: 68,
+    borderRadius: 24,
     backgroundColor: Colors.surfaceRaised,
     borderWidth: 1,
     borderTopColor: Colors.reliefTop,
     borderLeftColor: Colors.reliefTop,
     borderRightColor: Colors.border,
     borderBottomColor: Colors.reliefBottom,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
@@ -144,8 +147,11 @@ const styles = StyleSheet.create({
   },
   sideTab: {
     alignItems: 'center',
-    gap: 2,
-    width: 56,
+    gap: 3,
+    width: 64,
+  },
+  sideTabPressed: {
+    opacity: 0.6,
   },
   sideTabLabel: {
     fontSize: 10,
@@ -155,31 +161,24 @@ const styles = StyleSheet.create({
   sideTabLabelActive: {
     color: Colors.textPrimary,
   },
-  centerSlot: {
+  centerTab: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 3,
+    width: 64,
   },
-  centerButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  centerIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
-    marginTop: -28,
-    borderWidth: 3,
-    borderColor: Colors.background,
-    ...Platform.select({
-      ios: {
-        shadowColor: Colors.accent,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.6,
-        shadowRadius: 12,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
+    backgroundColor: 'rgba(108,92,231,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(108,92,231,0.35)',
+  },
+  centerIconWrapActive: {
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
   },
 });
 

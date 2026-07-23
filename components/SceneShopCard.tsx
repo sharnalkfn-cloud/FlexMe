@@ -1,7 +1,6 @@
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { memo, useCallback } from 'react';
-import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -62,15 +61,8 @@ function SceneShopCardComponent({ scene, onPress }: SceneShopCardProps) {
             <Text style={styles.emoji}>{scene.emoji}</Text>
           </View>
         )}
-        <LinearGradient colors={Gradients.cardOverlay} style={styles.overlay}>
-          <Text style={styles.name} numberOfLines={1}>
-            Photo IA
-          </Text>
-          <View style={styles.priceRow}>
-            <Ionicons name="logo-bitcoin" size={12} color={Colors.gold} />
-            <Text style={styles.priceText}>{scene.credits} CRÉDITS</Text>
-          </View>
-        </LinearGradient>
+
+        <LinearGradient colors={Gradients.cardOverlay} style={styles.overlay} />
       </LinearGradient>
     </AnimatedPressable>
   );
@@ -90,6 +82,17 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     position: 'relative',
     justifyContent: 'flex-end',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.25,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   emojiWrap: {
     ...StyleSheet.absoluteFillObject,
@@ -113,26 +116,8 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
+    height: '35%',
     zIndex: 1,
-    paddingHorizontal: 12,
-    paddingTop: 30,
-    paddingBottom: 12,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: Colors.textPrimary,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
-  },
-  priceText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: Colors.gold,
   },
 });
 

@@ -20,7 +20,6 @@ import { AppBackground } from '@/components/AppBackground';
 import { Colors, Radius } from '@/constants/colors';
 import { getSceneImageSource } from '@/constants/sceneImages';
 import { getSceneById } from '@/constants/scenes';
-import { useCredits } from '@/hooks/useCredits';
 import { useFaces } from '@/hooks/useFaces';
 import { GENERATION_STEPS, getStoredApiKey, setStoredApiKey, useGemini } from '@/hooks/useGemini';
 
@@ -31,10 +30,9 @@ export default function SceneDetailScreen() {
   const scene = getSceneById(id);
   const previewImage = getSceneImageSource(id);
   const { faces } = useFaces();
-  const { credits, spend } = useCredits();
   const { generate, loading, stepIndex, error, result } = useGemini();
   const [apiKey, setApiKey] = useState('');
-  const [creditError, setCreditError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     getStoredApiKey().then(setApiKey);
@@ -49,18 +47,13 @@ export default function SceneDetailScreen() {
 
   const handleGenerate = useCallback(async () => {
     if (!scene) return;
-    setCreditError(null);
+    setFormError(null);
     if (faces.length === 0) {
-      setCreditError('Add a face in the Snap tab first.');
+      setFormError('Add a face in the Snap tab first.');
       return;
     }
     if (!apiKey) {
-      setCreditError('Add your Gemini API key below.');
-      return;
-    }
-    const spent = await spend(scene.credits);
-    if (!spent) {
-      setCreditError('Not enough credits for this scene.');
+      setFormError('Add your Gemini API key below.');
       return;
     }
     await generate({
@@ -70,7 +63,7 @@ export default function SceneDetailScreen() {
       sceneId: scene.id,
       sceneName: scene.name,
     });
-  }, [apiKey, faces, generate, scene, spend]);
+  }, [apiKey, faces, generate, scene]);
 
   const handleDownload = useCallback(async () => {
     if (!result) return;
@@ -105,21 +98,17 @@ export default function SceneDetailScreen() {
               <Text style={styles.previewEmoji}>{scene.emoji}</Text>
             </LinearGradient>
           )}
-          <Pressable style={styles.closeButton} onPress={handleClose}>
+          <Pressable
+            style={({ pressed }) => [styles.closeButton, pressed && styles.closeButtonPressed]}
+            onPress={handleClose}>
             <Ionicons name="close" size={20} color={Colors.textPrimary} />
           </Pressable>
         </View>
 
         <View style={styles.content}>
           <View style={styles.titleRow}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.name}>{scene.name}</Text>
-              <Text style={styles.location}>{scene.location}</Text>
-            </View>
-            <View style={styles.priceTag}>
-              <Ionicons name="logo-bitcoin" size={14} color={Colors.gold} />
-              <Text style={styles.priceText}>{scene.credits}</Text>
-            </View>
+            <Text style={styles.name}>{scene.name}</Text>
+            <Text style={styles.location}>{scene.location}</Text>
           </View>
 
           <View style={styles.card}>
@@ -145,18 +134,25 @@ export default function SceneDetailScreen() {
             />
           </View>
 
-          <Text style={styles.balanceText}>Balance: {credits.toLocaleString()} credits</Text>
-
-          {(error || creditError) && <Text style={styles.errorText}>{error ?? creditError}</Text>}
+          {(error || formError) && (
+            <View style={styles.errorBox}>
+              <Ionicons name="alert-circle" size={16} color={Colors.danger} />
+              <Text style={styles.errorText}>{error ?? formError}</Text>
+            </View>
+          )}
 
           <Pressable
-            style={[styles.generateButton, !isReady && styles.generateButtonDisabled]}
+            style={({ pressed }) => [
+              styles.generateButton,
+              !isReady && styles.generateButtonDisabled,
+              pressed && isReady && styles.generateButtonPressed,
+            ]}
             onPress={handleGenerate}
             disabled={!isReady}>
             {loading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.generateButtonText}>Generate for {scene.credits} credits</Text>
+              <Text style={styles.generateButtonText}>Generate</Text>
             )}
           </Pressable>
 
@@ -180,8 +176,10 @@ export default function SceneDetailScreen() {
                 style={styles.resultImage}
                 resizeMode="cover"
               />
-              <Pressable style={styles.downloadButton} onPress={handleDownload}>
-                <Ionicons name="download-outline" size={18} color="#fff" />
+              <Pressable
+                style={({ pressed }) => [styles.downloadButton, pressed && styles.downloadButtonPressed]}
+                onPress={handleDownload}>
+                <Ionicons name="download-outline" size={18} color={Colors.textPrimary} />
                 <Text style={styles.downloadButtonText}>Download / Share</Text>
               </Pressable>
             </View>
@@ -230,14 +228,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  closeButtonPressed: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
   content: {
     padding: 20,
     gap: 14,
   },
   titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    gap: 4,
   },
   name: {
     fontSize: 22,
@@ -247,23 +246,6 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 13,
     color: Colors.textMuted,
-    marginTop: 4,
-  },
-  priceTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: Radius.pill,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-  },
-  priceText: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: Colors.gold,
   },
   card: {
     padding: 16,
@@ -288,21 +270,26 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     fontSize: 13,
   },
-  balanceText: {
-    fontSize: 12,
-    color: Colors.textMuted,
-    textAlign: 'center',
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
   },
   errorText: {
-    color: Colors.accent,
+    color: Colors.danger,
     fontSize: 13,
     textAlign: 'center',
+    flexShrink: 1,
   },
   generateButton: {
     backgroundColor: Colors.accent,
     paddingVertical: 16,
     borderRadius: Radius.button,
     alignItems: 'center',
+  },
+  generateButtonPressed: {
+    opacity: 0.85,
   },
   generateButtonDisabled: {
     opacity: 0.4,
@@ -357,6 +344,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     paddingVertical: 14,
     borderRadius: Radius.button,
+  },
+  downloadButtonPressed: {
+    opacity: 0.75,
   },
   downloadButtonText: {
     fontSize: 13,
