@@ -16,7 +16,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppBackground } from '@/components/AppBackground';
 import { Colors, Radius } from '@/constants/colors';
+import { getSceneImageSource } from '@/constants/sceneImages';
 import { getSceneById } from '@/constants/scenes';
 import { useCredits } from '@/hooks/useCredits';
 import { useFaces } from '@/hooks/useFaces';
@@ -27,6 +29,7 @@ export default function SceneDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const scene = getSceneById(id);
+  const previewImage = getSceneImageSource(id);
   const { faces } = useFaces();
   const { credits, spend } = useCredits();
   const { generate, loading, stepIndex, error, result } = useGemini();
@@ -92,11 +95,16 @@ export default function SceneDetailScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      <AppBackground />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}>
         <View style={styles.previewWrap}>
-          <LinearGradient colors={scene.bgColors} style={styles.preview}>
-            <Text style={styles.previewEmoji}>{scene.emoji}</Text>
-          </LinearGradient>
+          {previewImage ? (
+            <Image source={previewImage} style={styles.preview} resizeMode="cover" />
+          ) : (
+            <LinearGradient colors={scene.bgColors} style={styles.preview}>
+              <Text style={styles.previewEmoji}>{scene.emoji}</Text>
+            </LinearGradient>
+          )}
           <Pressable style={styles.closeButton} onPress={handleClose}>
             <Ionicons name="close" size={20} color={Colors.textPrimary} />
           </Pressable>
@@ -196,9 +204,15 @@ const styles = StyleSheet.create({
   },
   previewWrap: {
     height: 240,
+    overflow: 'hidden',
+    position: 'relative',
   },
   preview: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -280,12 +294,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   errorText: {
-    color: Colors.red,
+    color: Colors.accent,
     fontSize: 13,
     textAlign: 'center',
   },
   generateButton: {
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
     paddingVertical: 16,
     borderRadius: Radius.button,
     alignItems: 'center',
@@ -313,7 +327,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.border,
   },
   loadingDotActive: {
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
   },
   loadingStepText: {
     fontSize: 13,

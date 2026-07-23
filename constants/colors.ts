@@ -1,10 +1,13 @@
 export const Colors = {
-  background: '#0A0A0C',
-  surface: '#151316',
+  background: '#151417',
+  surface: '#1E1D22',
+  surfaceRaised: '#242329',
   surfaceMuted: 'rgba(255,255,255,0.05)',
   border: 'rgba(255,255,255,0.08)',
-  red: '#E8213C',
-  redDark: '#8C0F20',
+  reliefTop: 'rgba(255,255,255,0.07)',
+  reliefBottom: 'rgba(0,0,0,0.35)',
+  accent: '#6C5CE7',
+  accentDark: '#3B2FA0',
   gold: '#F0B429',
   textPrimary: '#FFFFFF',
   textMuted: 'rgba(255,255,255,0.45)',
@@ -13,8 +16,9 @@ export const Colors = {
 };
 
 export const Gradients = {
-  red: ['#FF3B54', '#8C0F20'] as const,
+  accent: ['#8B7CFF', '#4A3FC7'] as const,
   cardOverlay: ['transparent', 'rgba(0,0,0,0.92)'] as const,
+  reliefCard: ['#26252B', '#1A191D'] as const,
 };
 
 export const Radius = {

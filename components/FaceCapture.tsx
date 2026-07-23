@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     borderRadius: 999,
     borderWidth: 2,
-    borderColor: Colors.red,
+    borderColor: Colors.accent,
     borderStyle: 'dashed',
   },
   shutter: {
@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
   },
   permissionCard: {
     padding: 24,
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   permissionButton: {
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: Radius.button,

@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppBackground } from '@/components/AppBackground';
 import { FaceCapture, type CapturedFace } from '@/components/FaceCapture';
 import { Colors, Radius } from '@/constants/colors';
 import { useFaces } from '@/hooks/useFaces';
@@ -37,6 +38,7 @@ export default function SnapScreen() {
 
   return (
     <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+      <AppBackground />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 140 }}>
         <View style={styles.header}>
           <Text style={styles.title}>Snap</Text>
@@ -73,7 +75,7 @@ export default function SnapScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.background,
   },
   header: {
     paddingHorizontal: 20,
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     borderWidth: 2,
-    borderColor: Colors.red,
+    borderColor: Colors.accent,
   },
   faceHint: {
     fontSize: 11,

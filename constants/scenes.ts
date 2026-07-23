@@ -46,6 +46,21 @@ export const SCENES: Scene[] = [
       'Use the uploaded reference image for the male subject. The facial identity must be reproduced 1:1 with absolutely no changes to bone structure, facial proportions, skin tone, hairline, facial hair density, or overall appearance. No beautification. No smoothing. No substitutions. Natural skin texture preserved. A completely unplanned vertical iPhone photo (9:16) captured at night from another jet ski floating on calm water. Slight handheld instability. Slight tilt. Not centered. Slight digital grain from low light. Looks like a friend quickly lifted the phone to capture the moment. Distance composition: The camera is approximately 6–7 meters away from the subject. The male subject is standing upright on a black jet ski floating still on the water. Roughly 15 meters behind him there is a large luxury superyacht with full exterior lights on. Further in the distance, the Dubai skyline is clearly visible, including recognizable skyscraper silhouettes glowing in the night air. The subject is wearing only fitted swim shorts. Upper body completely visible. Face clearly visible. He is balanced confidently on the jet ski seat platform. One arm relaxed at his side. The other hand raised slightly outward making a clear hand gesture. Not exaggerated. Natural. Casual. Slight confident expression. Physique: Thick chest. Broad shoulders. Full arms. Visible abdominal definition. Strong quad structure. Natural muscle density — not exaggerated. Slight sheen from ocean water reflection. Environment details: Calm dark water with subtle reflections from yacht lights. Small ripples around the jet ski. The yacht behind has multiple deck levels illuminated with warm white lighting. Interior cabin glow visible. Soft blue and gold city lights from Dubai skyline reflecting across the water surface. Very slight humidity haze in the air. Jet ski details: Modern performance jet ski. Gloss black body. Handlebars visible. Front nose slightly angled toward camera. No distortion of proportions. Lighting: Mixed yacht light + city skyline glow. Uneven exposure typical of iPhone night shot. Slight grain. No spotlight effect. No cinematic grading. Realistic night contrast. The image should feel like: Late Dubai night. Water still. Engine off. Yacht behind. City glowing. Captured spontaneously. Real presence.',
   },
   {
+    id: 'dubai_valet',
+    emoji: '🚗',
+    name: 'Dubai Hotel Valet Porsche',
+    location: 'Downtown Dubai',
+    category: 'Dubai',
+    bgColors: ['#1a1712', '#08070a'],
+    badge: null,
+    credits: 10,
+    description:
+      'Sitting in a Porsche at a five-star hotel valet stand in Dubai, Lamborghinis and palm trees in the porte-cochère behind, checking your phone.',
+    outfitDetails: 'Black hoodie, black AirPods.',
+    prompt:
+      'Use the uploaded reference image for the male subject. The facial identity must be reproduced 1:1 with absolutely no changes to bone structure, facial proportions, skin tone, hairline, facial hair density, or overall appearance. No beautification. No smoothing. No substitutions. Natural skin texture preserved. A completely unplanned side-angle iPhone photo (9:16) taken through the open driver window of a dark grey Porsche at a five-star hotel valet stand in Downtown Dubai at golden hour. The subject sits in the driver seat wearing a black hoodie with one AirPod in, looking down at his phone mid-scroll, resting his forearm on the window sill. Behind him, under the hotel\'s illuminated porte-cochère, several Lamborghinis and a Porsche are parked at the valet stand, palm trees and a "Valet" sign visible. Warm architectural up-lighting mixed with soft daylight, natural handheld imperfection, no cinematic grading. Shot on iPhone 15 Pro Max. RAW capture. Photorealistic. No AI aesthetic. No CGI. No watermark. No text. 8K quality.',
+  },
+  {
     id: 'dubai_shopping_lambo',
     emoji: '🛍️',
     name: 'Dubai Shopping Bags in Lamborghini',

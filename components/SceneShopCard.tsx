@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { memo, useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { Colors, Gradients, Radius } from '@/constants/colors';
+import { getSceneImageSource } from '@/constants/sceneImages';
 import type { Scene } from '@/constants/scenes';
 
 interface SceneShopCardProps {
@@ -18,12 +19,15 @@ interface SceneShopCardProps {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-const BADGE_STYLES: Record<string, { background: string; text: string }> = {
-  NEW: { background: Colors.green, text: '#08120c' },
-  HOT: { background: Colors.red, text: '#ffffff' },
-};
+// Matches studio.tsx's grid: gridContent paddingHorizontal 16, gridRow gap 10.
+const GRID_HORIZONTAL_PADDING = 16;
+const GRID_GAP = 10;
 
 function SceneShopCardComponent({ scene, onPress }: SceneShopCardProps) {
+  const { width: windowWidth } = useWindowDimensions();
+  const columnWidth = (windowWidth - GRID_HORIZONTAL_PADDING * 2 - GRID_GAP) / 2;
+  const cardHeight = columnWidth * (4 / 3);
+
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -42,23 +46,22 @@ function SceneShopCardComponent({ scene, onPress }: SceneShopCardProps) {
     onPress(scene);
   }, [onPress, scene]);
 
-  const badge = scene.badge ? BADGE_STYLES[scene.badge] : null;
+  const imageSource = getSceneImageSource(scene.id);
 
   return (
     <AnimatedPressable
       onPress={handlePress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={[styles.flexItem, animatedStyle]}>
+      style={[styles.flexItem, { height: cardHeight }, animatedStyle]}>
       <LinearGradient colors={scene.bgColors} style={styles.card} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-        {badge && (
-          <View style={[styles.badge, { backgroundColor: badge.background }]}>
-            <Text style={[styles.badgeText, { color: badge.text }]}>{scene.badge}</Text>
+        {imageSource ? (
+          <Image source={imageSource} style={styles.image} resizeMode="cover" />
+        ) : (
+          <View style={styles.emojiWrap}>
+            <Text style={styles.emoji}>{scene.emoji}</Text>
           </View>
         )}
-        <View style={styles.emojiWrap}>
-          <Text style={styles.emoji}>{scene.emoji}</Text>
-        </View>
         <LinearGradient colors={Gradients.cardOverlay} style={styles.overlay}>
           <Text style={styles.name} numberOfLines={1}>
             Photo IA
@@ -78,7 +81,6 @@ export const SceneShopCard = memo(SceneShopCardComponent);
 const styles = StyleSheet.create({
   flexItem: {
     flex: 1,
-    height: 190,
   },
   card: {
     flex: 1,
@@ -86,30 +88,32 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderColor: Colors.border,
     overflow: 'hidden',
+    position: 'relative',
     justifyContent: 'flex-end',
-  },
-  badge: {
-    position: 'absolute',
-    top: 8,
-    left: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: Radius.pill,
-    zIndex: 2,
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '800',
   },
   emojiWrap: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 0,
   },
   emoji: {
     fontSize: 44,
   },
+  image: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 0,
+  },
   overlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
     paddingHorizontal: 12,
     paddingTop: 30,
     paddingBottom: 12,

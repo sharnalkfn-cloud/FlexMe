@@ -5,12 +5,20 @@ import { Alert, FlatList, Pressable, StyleSheet, Text, View } from 'react-native
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AppBackground } from '@/components/AppBackground';
 import { SceneShopCard } from '@/components/SceneShopCard';
 import { Colors, Radius } from '@/constants/colors';
-import { SCENES, type Scene } from '@/constants/scenes';
+import { getSceneById, type Scene } from '@/constants/scenes';
 import { useCredits } from '@/hooks/useCredits';
 
 type Mode = 'Photo' | 'Video';
+
+// Only the scenes with a real reference image (constants/sceneImages.ts) are
+// shown for now. The rest of constants/scenes.ts stays intact for later.
+const VISIBLE_SCENE_IDS = ['girlfriend_jet_bugatti', 'dubai_valet', 'dubai_shopping_lambo', 'highrise_pool'];
+const VISIBLE_SCENES: Scene[] = VISIBLE_SCENE_IDS.map(getSceneById).filter(
+  (scene): scene is Scene => scene !== undefined
+);
 
 export default function StudioScreen() {
   const router = useRouter();
@@ -18,7 +26,7 @@ export default function StudioScreen() {
   const { credits } = useCredits();
   const [mode, setMode] = useState<Mode>('Photo');
 
-  const scenes = useMemo(() => (mode === 'Photo' ? SCENES : []), [mode]);
+  const scenes = useMemo(() => (mode === 'Photo' ? VISIBLE_SCENES : []), [mode]);
 
   const handleScenePress = useCallback(
     (scene: Scene) => {
@@ -37,6 +45,7 @@ export default function StudioScreen() {
 
   return (
     <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+      <AppBackground />
       <View style={styles.headerRow}>
         <Pressable onPress={handleMenuPress} style={styles.iconButton}>
           <Ionicons name="menu" size={22} color={Colors.textPrimary} />
@@ -74,7 +83,9 @@ export default function StudioScreen() {
         renderItem={({ item }) => <SceneShopCard scene={item} onPress={handleScenePress} />}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>Video generation is coming soon.</Text>
+            <Text style={styles.emptyText}>
+              {mode === 'Photo' ? 'New scenes are coming soon.' : 'Video generation is coming soon.'}
+            </Text>
           </View>
         }
       />
@@ -85,7 +96,7 @@ export default function StudioScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: Colors.background,
   },
   headerRow: {
     flexDirection: 'row',
@@ -100,12 +111,17 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.surfaceMuted,
+    backgroundColor: Colors.surfaceRaised,
+    borderWidth: 1,
+    borderTopColor: Colors.reliefTop,
+    borderLeftColor: Colors.reliefTop,
+    borderRightColor: Colors.border,
+    borderBottomColor: Colors.reliefBottom,
   },
   logo: {
     fontSize: 20,
     fontWeight: '900',
-    color: Colors.red,
+    color: Colors.accent,
     letterSpacing: 2,
     fontStyle: 'italic',
   },
@@ -117,9 +133,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceRaised,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderTopColor: Colors.reliefTop,
+    borderLeftColor: Colors.reliefTop,
+    borderRightColor: Colors.border,
+    borderBottomColor: Colors.reliefBottom,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: Radius.pill,
@@ -136,7 +155,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 5,
@@ -152,10 +171,13 @@ const styles = StyleSheet.create({
   toggleRow: {
     flexDirection: 'row',
     alignSelf: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceRaised,
     borderRadius: Radius.pill,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderTopColor: Colors.reliefTop,
+    borderLeftColor: Colors.reliefTop,
+    borderRightColor: Colors.border,
+    borderBottomColor: Colors.reliefBottom,
     padding: 4,
     marginTop: 16,
     marginBottom: 8,
@@ -166,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.pill,
   },
   togglePillActive: {
-    backgroundColor: Colors.red,
+    backgroundColor: Colors.accent,
   },
   toggleText: {
     fontSize: 13,

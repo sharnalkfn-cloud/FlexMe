@@ -1,7 +1,7 @@
 import { ScrollViewStyleReset } from 'expo-router/html';
 import React, { type PropsWithChildren } from 'react';
 
-const BACKGROUND_COLOR = '#0A0A0C';
+const BACKGROUND_COLOR = '#0A0A14';
 
 /**
  * Root document for the web build. Without this, html/body/#root have no

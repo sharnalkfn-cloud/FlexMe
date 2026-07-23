@@ -2,15 +2,14 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet, View } from 'react-native';
 import 'react-native-reanimated';
 
-import { Colors } from '@/constants/colors';
+import { AppBackground } from '@/components/AppBackground';
 
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: Colors.background }]} />
+      <AppBackground />
       <Stack
         screenOptions={{
           headerShown: false,

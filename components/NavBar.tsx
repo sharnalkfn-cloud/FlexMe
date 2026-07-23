@@ -94,7 +94,7 @@ export function NavBar({ state, navigation }: BottomTabBarProps) {
             onPressOut={handleCenterPressOut}
             style={[styles.centerButton, centerStyle]}
             accessibilityLabel="Studio">
-            <LinearGradient colors={Gradients.red} style={StyleSheet.absoluteFillObject} />
+            <LinearGradient colors={Gradients.accent} style={StyleSheet.absoluteFillObject} />
             <Ionicons name="sparkles" size={24} color="#fff" />
           </AnimatedPressable>
         </View>
@@ -123,9 +123,12 @@ const styles = StyleSheet.create({
     width: 260,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#141216',
+    backgroundColor: Colors.surfaceRaised,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderTopColor: Colors.reliefTop,
+    borderLeftColor: Colors.reliefTop,
+    borderRightColor: Colors.border,
+    borderBottomColor: Colors.reliefBottom,
     paddingHorizontal: 20,
     ...Platform.select({
       ios: {
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.background,
     ...Platform.select({
       ios: {
-        shadowColor: Colors.red,
+        shadowColor: Colors.accent,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.6,
         shadowRadius: 12,
