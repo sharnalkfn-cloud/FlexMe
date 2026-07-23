@@ -1,29 +1,24 @@
 export const Colors = {
-  background: '#0A2A5E',
-  glassBg: 'rgba(255,255,255,0.05)',
-  glassBorder: 'rgba(255,255,255,0.08)',
-  accent: '#dceeff',
-  gold: '#e8b84b',
-  textPrimary: '#f0f4ff',
-  textMuted: 'rgba(240,244,255,0.32)',
-  purple: '#7c5cff',
-  blue: '#4a7cff',
-  violet: '#9c5cff',
-  red: '#ff4757',
-  green: '#2ed573',
+  background: '#0A0A0C',
+  surface: '#151316',
+  surfaceMuted: 'rgba(255,255,255,0.05)',
+  border: 'rgba(255,255,255,0.08)',
+  red: '#E8213C',
+  redDark: '#8C0F20',
+  gold: '#F0B429',
+  textPrimary: '#FFFFFF',
+  textMuted: 'rgba(255,255,255,0.45)',
+  textFaint: 'rgba(255,255,255,0.28)',
+  green: '#2ED573',
 };
 
 export const Gradients = {
-  purpleBlue: ['#7c5cff', '#4a7cff'] as const,
-  violetBlue: ['#9c5cff', '#4a7cff'] as const,
-  gold: ['#f5cc6f', '#e8b84b'] as const,
-  ambientPurple: ['rgba(124,92,255,0.35)', 'rgba(124,92,255,0)'] as const,
-  ambientBlue: ['rgba(74,124,255,0.3)', 'rgba(74,124,255,0)'] as const,
-  cardOverlay: ['transparent', 'rgba(0,0,0,0.97)'] as const,
+  red: ['#FF3B54', '#8C0F20'] as const,
+  cardOverlay: ['transparent', 'rgba(0,0,0,0.92)'] as const,
 };
 
 export const Radius = {
-  card: 18,
+  card: 16,
   pill: 100,
   button: 16,
 };

@@ -1,24 +1,20 @@
-import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors, Radius } from '@/constants/colors';
-import { GlassCard } from '@/components/GlassCard';
 
 export interface CapturedFace {
   uri: string;
   base64: string;
-  angle: 'Front' | 'Left' | 'Right';
 }
 
 interface FaceCaptureProps {
-  angle: 'Front' | 'Left' | 'Right';
   onCapture: (face: CapturedFace) => void;
 }
 
-export function FaceCapture({ angle, onCapture }: FaceCaptureProps) {
+export function FaceCapture({ onCapture }: FaceCaptureProps) {
   const [permission, requestPermission] = useCameraPermissions();
-  const [facing] = useState<CameraType>('front');
   const cameraRef = useRef<CameraView>(null);
   const [capturing, setCapturing] = useState(false);
 
@@ -26,17 +22,14 @@ export function FaceCapture({ angle, onCapture }: FaceCaptureProps) {
     if (!cameraRef.current || capturing) return;
     setCapturing(true);
     try {
-      const photo = await cameraRef.current.takePictureAsync({
-        base64: true,
-        quality: 0.8,
-      });
+      const photo = await cameraRef.current.takePictureAsync({ base64: true, quality: 0.8 });
       if (photo?.base64) {
-        onCapture({ uri: photo.uri, base64: photo.base64, angle });
+        onCapture({ uri: photo.uri, base64: photo.base64 });
       }
     } finally {
       setCapturing(false);
     }
-  }, [angle, capturing, onCapture]);
+  }, [capturing, onCapture]);
 
   if (!permission) {
     return <View style={styles.container} />;
@@ -44,20 +37,18 @@ export function FaceCapture({ angle, onCapture }: FaceCaptureProps) {
 
   if (!permission.granted) {
     return (
-      <GlassCard style={styles.permissionCard}>
-        <Text style={styles.permissionText}>
-          Camera access is needed to scan your face.
-        </Text>
+      <View style={styles.permissionCard}>
+        <Text style={styles.permissionText}>Camera access is needed to snap your face.</Text>
         <Pressable style={styles.permissionButton} onPress={requestPermission}>
           <Text style={styles.permissionButtonText}>Grant Access</Text>
         </Pressable>
-      </GlassCard>
+      </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
+      <CameraView ref={cameraRef} style={styles.camera} facing="front">
         <View style={styles.faceGuide} />
       </CameraView>
       <Pressable
@@ -90,7 +81,7 @@ const styles = StyleSheet.create({
     aspectRatio: 3 / 4,
     borderRadius: 999,
     borderWidth: 2,
-    borderColor: Colors.accent,
+    borderColor: Colors.red,
     borderStyle: 'dashed',
   },
   shutter: {
@@ -110,12 +101,16 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.textPrimary,
+    backgroundColor: Colors.red,
   },
   permissionCard: {
     padding: 24,
     alignItems: 'center',
     gap: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.card,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   permissionText: {
     color: Colors.textPrimary,
@@ -123,13 +118,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   permissionButton: {
-    backgroundColor: Colors.accent,
+    backgroundColor: Colors.red,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: Radius.button,
   },
   permissionButtonText: {
-    color: '#08080c',
+    color: '#fff',
     fontWeight: '700',
     fontSize: 14,
   },

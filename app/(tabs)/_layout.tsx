@@ -7,11 +7,13 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <NavBar {...props} />}
-      screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="explore" options={{ title: 'Explore' }} />
-      <Tabs.Screen name="generate" options={{ title: 'Generate' }} />
-      <Tabs.Screen name="history" options={{ title: 'History' }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profile' }} />
+      screenOptions={{
+        headerShown: false,
+        sceneStyle: { backgroundColor: 'transparent' },
+      }}>
+      <Tabs.Screen name="snap" options={{ title: 'Snap' }} />
+      <Tabs.Screen name="studio" options={{ title: 'Studio' }} />
+      <Tabs.Screen name="galerie" options={{ title: 'Galerie' }} />
     </Tabs>
   );
 }

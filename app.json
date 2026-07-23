@@ -7,14 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "flexme",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#0A2A5E",
+    "backgroundColor": "#0A0A0C",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.flexme.app",
-      "usesAppleSignIn": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "FlexMe needs camera access to scan your face for photorealistic generations.",
+        "NSCameraUsageDescription": "FlexMe needs camera access to snap your face for photorealistic generations.",
         "NSPhotoLibraryUsageDescription": "FlexMe needs photo library access to select face photos and save generated images.",
         "NSPhotoLibraryAddUsageDescription": "FlexMe saves your generated photos to your photo library."
       }
@@ -22,7 +21,7 @@
     "android": {
       "package": "com.flexme.app",
       "adaptiveIcon": {
-        "backgroundColor": "#0A2A5E",
+        "backgroundColor": "#0A0A0C",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -42,18 +41,16 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#0A2A5E",
+          "backgroundColor": "#0A0A0C",
           "dark": {
-            "backgroundColor": "#0A2A5E"
+            "backgroundColor": "#0A0A0C"
           }
         }
       ],
-      "expo-web-browser",
-      "expo-apple-authentication",
       [
         "expo-camera",
         {
-          "cameraPermission": "FlexMe needs camera access to scan your face for photorealistic generations."
+          "cameraPermission": "FlexMe needs camera access to snap your face for photorealistic generations."
         }
       ],
       [

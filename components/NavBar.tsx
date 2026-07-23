@@ -1,49 +1,31 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { BlurView } from 'expo-blur';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import React, { useCallback, useState } from 'react';
-import {
-  AccessibilityInfo,
-  LayoutChangeEvent,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  explore: 'compass',
-  generate: 'sparkles',
-  history: 'time',
-  profile: 'person',
-};
+import { Colors, Gradients } from '@/constants/colors';
 
-const TAB_ICONS_OUTLINE: Record<string, keyof typeof Ionicons.glyphMap> = {
-  explore: 'compass-outline',
-  generate: 'sparkles-outline',
-  history: 'time-outline',
-  profile: 'person-outline',
+const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  snap: 'camera-outline',
+  galerie: 'folder-outline',
 };
 
 const TAB_LABELS: Record<string, string> = {
-  explore: 'Explore',
-  generate: 'Generate',
-  history: 'History',
-  profile: 'Profile',
+  snap: 'Snap',
+  galerie: 'Galerie',
 };
 
-const EXPAND_TRANSITION = { stiffness: 260, damping: 24 };
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-function TabItem({
+function SideTab({
   routeName,
   focused,
   onPress,
@@ -52,114 +34,78 @@ function TabItem({
   focused: boolean;
   onPress: () => void;
 }) {
-  const [labelWidth, setLabelWidth] = useState(0);
-
-  const paddingHorizontal = useSharedValue(8);
-  const labelProgress = useSharedValue(0);
-
-  React.useEffect(() => {
-    paddingHorizontal.value = withSpring(focused ? 16 : 8, EXPAND_TRANSITION);
-    labelProgress.value = withSpring(focused ? 1 : 0, EXPAND_TRANSITION);
-  }, [focused, labelProgress, paddingHorizontal]);
-
-  const buttonStyle = useAnimatedStyle(() => ({
-    paddingHorizontal: paddingHorizontal.value,
-    backgroundColor: focused ? 'rgba(255,255,255,0.10)' : 'transparent',
-  }));
-
-  const labelStyle = useAnimatedStyle(() => ({
-    width: labelProgress.value * labelWidth,
-    opacity: labelProgress.value,
-    marginLeft: labelProgress.value * 6,
-  }));
-
-  const handleMeasureLabel = useCallback((e: LayoutChangeEvent) => {
-    setLabelWidth(e.nativeEvent.layout.width);
-  }, []);
-
-  const iconName = (focused ? TAB_ICONS[routeName] : TAB_ICONS_OUTLINE[routeName]) ?? 'ellipse';
-  const label = TAB_LABELS[routeName] ?? routeName;
-
   return (
-    <Pressable onPress={onPress} accessibilityLabel={label}>
-      <Animated.View style={[styles.tabButton, buttonStyle]}>
-        <Ionicons
-          name={iconName}
-          size={18}
-          color={focused ? 'rgba(255,255,255,0.92)' : 'rgba(255,255,255,0.48)'}
-        />
-        <Animated.View style={[styles.labelWrap, labelStyle]}>
-          <Text style={styles.labelText} numberOfLines={1}>
-            {label}
-          </Text>
-        </Animated.View>
-        {/* Offscreen measure pass: captures the label's natural width once. */}
-        <Text style={styles.labelMeasure} onLayout={handleMeasureLabel}>
-          {label}
-        </Text>
-      </Animated.View>
+    <Pressable onPress={onPress} style={styles.sideTab} accessibilityLabel={TAB_LABELS[routeName]}>
+      <Ionicons
+        name={TAB_ICONS[routeName] ?? 'ellipse-outline'}
+        size={22}
+        color={focused ? Colors.textPrimary : Colors.textMuted}
+      />
+      <Text style={[styles.sideTabLabel, focused && styles.sideTabLabelActive]}>
+        {TAB_LABELS[routeName] ?? routeName}
+      </Text>
     </Pressable>
   );
 }
 
 export function NavBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const mountOpacity = useSharedValue(0);
-  const mountTranslateY = useSharedValue(60);
+  const centerScale = useSharedValue(1);
 
-  React.useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then((enabled) => {
-      if (enabled) {
-        mountOpacity.value = 1;
-        mountTranslateY.value = 0;
-      } else {
-        mountOpacity.value = withDelay(100, withSpring(1, { stiffness: 260, damping: 26 }));
-        mountTranslateY.value = withDelay(100, withSpring(0, { stiffness: 260, damping: 26 }));
-      }
-    });
-  }, [mountOpacity, mountTranslateY]);
+  const centerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: centerScale.value }],
+  }));
 
   const handlePress = useCallback(
     (routeName: string, index: number) => {
       Haptics.selectionAsync();
-      const isFocused = state.index === index;
-      if (!isFocused) {
+      if (state.index !== index) {
         navigation.navigate(routeName);
       }
     },
     [navigation, state.index]
   );
 
-  const mountStyle = useAnimatedStyle(() => ({
-    opacity: mountOpacity.value,
-    transform: [{ translateY: mountTranslateY.value }],
-  }));
+  const handleCenterPressIn = useCallback(() => {
+    centerScale.value = withSpring(0.9, { stiffness: 500, damping: 20 });
+  }, [centerScale]);
+
+  const handleCenterPressOut = useCallback(() => {
+    centerScale.value = withSpring(1, { stiffness: 500, damping: 20 });
+  }, [centerScale]);
+
+  const snapIndex = state.routes.findIndex((r) => r.name === 'snap');
+  const studioIndex = state.routes.findIndex((r) => r.name === 'studio');
+  const galerieIndex = state.routes.findIndex((r) => r.name === 'galerie');
 
   return (
-    <Animated.View
-      style={[styles.container, { bottom: insets.bottom + 14 }, mountStyle]}
-      pointerEvents="box-none">
-      <View style={styles.pillWrapper}>
-        {Platform.OS === 'web' ? (
-          // Safari breaks backdrop-filter when an ancestor has a CSS
-          // transform (react-navigation's screen containers do), rendering
-          // it as opaque white. Use a flat translucent fill on web instead.
-          <View style={[StyleSheet.absoluteFillObject, styles.webGlassFallback]} />
-        ) : (
-          <BlurView tint="dark" intensity={100} style={StyleSheet.absoluteFillObject} />
-        )}
-        <View style={styles.row}>
-          {state.routes.map((route, index) => (
-            <TabItem
-              key={route.key}
-              routeName={route.name}
-              focused={state.index === index}
-              onPress={() => handlePress(route.name, index)}
-            />
-          ))}
+    <View style={[styles.container, { bottom: insets.bottom + 12 }]} pointerEvents="box-none">
+      <View style={styles.bar}>
+        <SideTab
+          routeName="snap"
+          focused={state.index === snapIndex}
+          onPress={() => handlePress('snap', snapIndex)}
+        />
+
+        <View style={styles.centerSlot}>
+          <AnimatedPressable
+            onPress={() => handlePress('studio', studioIndex)}
+            onPressIn={handleCenterPressIn}
+            onPressOut={handleCenterPressOut}
+            style={[styles.centerButton, centerStyle]}
+            accessibilityLabel="Studio">
+            <LinearGradient colors={Gradients.red} style={StyleSheet.absoluteFillObject} />
+            <Ionicons name="sparkles" size={24} color="#fff" />
+          </AnimatedPressable>
         </View>
+
+        <SideTab
+          routeName="galerie"
+          focused={state.index === galerieIndex}
+          onPress={() => handlePress('galerie', galerieIndex)}
+        />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -170,55 +116,67 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
   },
-  webGlassFallback: {
-    backgroundColor: 'rgba(10,10,16,0.72)',
-  },
-  pillWrapper: {
-    borderRadius: 18,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+  bar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 260,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#141216',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.12)',
+    borderColor: Colors.border,
+    paddingHorizontal: 20,
     ...Platform.select({
       ios: {
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 8 },
         shadowOpacity: 0.5,
-        shadowRadius: 24,
+        shadowRadius: 20,
       },
       android: {
-        elevation: 12,
+        elevation: 10,
       },
     }),
   },
-  row: {
-    flexDirection: 'row',
+  sideTab: {
     alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 6,
-    paddingVertical: 8,
+    gap: 2,
+    width: 56,
   },
-  tabButton: {
-    flexDirection: 'row',
+  sideTabLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.textMuted,
+  },
+  sideTabLabelActive: {
+    color: Colors.textPrimary,
+  },
+  centerSlot: {
     alignItems: 'center',
-    height: 40,
-    borderRadius: 14,
+    justifyContent: 'center',
+  },
+  centerButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
     overflow: 'hidden',
-  },
-  labelWrap: {
-    overflow: 'hidden',
-  },
-  labelText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.92)',
-  },
-  labelMeasure: {
-    position: 'absolute',
-    opacity: 0,
-    fontSize: 13,
-    fontWeight: '700',
-    left: 9999,
+    marginTop: -28,
+    borderWidth: 3,
+    borderColor: Colors.background,
+    ...Platform.select({
+      ios: {
+        shadowColor: Colors.red,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.6,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
 });
 

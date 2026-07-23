@@ -6,7 +6,6 @@ const FACES_STORAGE_KEY = 'flexme_faces';
 export interface StoredFace {
   uri: string;
   base64: string;
-  angle: 'Front' | 'Left' | 'Right';
 }
 
 export function useFaces() {
@@ -40,17 +39,12 @@ export function useFaces() {
 
   const removeFace = useCallback(
     async (index: number) => {
-      const next = faces.filter((_, i) => i !== index);
-      await persist(next);
+      await persist(faces.filter((_, i) => i !== index));
     },
     [faces, persist]
   );
 
-  const clearFaces = useCallback(async () => {
-    await persist([]);
-  }, [persist]);
-
-  return { faces, loading, addFace, removeFace, clearFaces };
+  return { faces, loading, addFace, removeFace };
 }
 
 export default useFaces;

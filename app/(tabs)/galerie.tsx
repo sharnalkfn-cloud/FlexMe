@@ -1,16 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import {
-  Alert,
-  FlatList,
-  Image,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Alert, FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -21,14 +12,12 @@ import {
   type GenerationRecord,
 } from '@/hooks/useGemini';
 
-export default function HistoryScreen() {
+export default function GalerieScreen() {
   const insets = useSafeAreaInsets();
   const [history, setHistory] = useState<GenerationRecord[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
-    const records = await getGenerationHistory();
-    setHistory(records);
+    setHistory(await getGenerationHistory());
   }, []);
 
   useFocusEffect(
@@ -37,22 +26,13 @@ export default function HistoryScreen() {
     }, [load])
   );
 
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await load();
-    setRefreshing(false);
-  }, [load]);
-
   const handleLongPress = useCallback((record: GenerationRecord) => {
-    Alert.alert('Delete photo', 'Remove this generated photo from your history?', [
+    Alert.alert('Delete photo', 'Remove this generated photo from your gallery?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: async () => {
-          const next = await deleteGenerationRecord(record.id);
-          setHistory(next);
-        },
+        onPress: async () => setHistory(await deleteGenerationRecord(record.id)),
       },
     ]);
   }, []);
@@ -60,8 +40,8 @@ export default function HistoryScreen() {
   return (
     <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>History</Text>
-        <Text style={styles.subtitle}>{history.length} generated photos</Text>
+        <Text style={styles.title}>Galerie</Text>
+        <Text style={styles.subtitle}>{history.length} photos générées</Text>
       </View>
 
       <FlatList
@@ -69,20 +49,16 @@ export default function HistoryScreen() {
         keyExtractor={(item) => item.id}
         numColumns={3}
         columnWrapperStyle={styles.row}
-        contentContainerStyle={[styles.gridContent, { paddingBottom: insets.bottom + 120 }]}
-        refreshControl={<RefreshControl tintColor={Colors.accent} refreshing={refreshing} onRefresh={handleRefresh} />}
+        contentContainerStyle={[styles.gridContent, { paddingBottom: insets.bottom + 140 }]}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="images-outline" size={40} color={Colors.textMuted} />
-            <Text style={styles.emptyText}>Generate your first photo</Text>
+            <Text style={styles.emptyText}>Génère ta première photo</Text>
           </View>
         }
         renderItem={({ item }) => (
           <Pressable style={styles.item} onLongPress={() => handleLongPress(item)}>
-            <Image
-              source={{ uri: `data:image/jpeg;base64,${item.imageBase64}` }}
-              style={styles.itemImage}
-            />
+            <Image source={{ uri: `data:image/jpeg;base64,${item.imageBase64}` }} style={styles.itemImage} />
           </Pressable>
         )}
       />
@@ -122,7 +98,7 @@ const styles = StyleSheet.create({
     aspectRatio: 9 / 14,
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: Colors.glassBg,
+    backgroundColor: Colors.surface,
   },
   itemImage: {
     flex: 1,

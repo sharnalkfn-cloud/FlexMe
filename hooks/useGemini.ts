@@ -108,5 +108,3 @@ export async function getStoredApiKey(): Promise<string> {
 export async function setStoredApiKey(key: string): Promise<void> {
   await AsyncStorage.setItem(API_KEY_STORAGE_KEY, key);
 }
-
-export default useGemini;
