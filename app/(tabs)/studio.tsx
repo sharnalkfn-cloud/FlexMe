@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppBackground } from '@/components/AppBackground';
@@ -10,7 +9,7 @@ import { SceneShopCard } from '@/components/SceneShopCard';
 import { Colors, Radius } from '@/constants/colors';
 import { getSceneById, type Scene } from '@/constants/scenes';
 
-type Mode = 'Photo' | 'Video';
+type Mode = 'Photo' | 'TextToPhoto';
 
 // Only the scenes with a real reference image (constants/sceneImages.ts) are
 // shown for now. The rest of constants/scenes.ts stays intact for later.
@@ -34,25 +33,32 @@ export default function StudioScreen() {
   );
 
   return (
-    <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <AppBackground />
       <View style={styles.headerRow}>
         <Text style={styles.logo}>FLEXME</Text>
       </View>
 
-      <View style={styles.titleRow}>
-        <View style={styles.titleBlock}>
-          <Text style={styles.title}>Générer</Text>
-          <Text style={styles.subtitle}>Pick a scene, add your face, generate.</Text>
-        </View>
-        <View style={styles.toggleRow}>
-          <Pressable onPress={() => setMode('Photo')} style={[styles.togglePill, mode === 'Photo' && styles.togglePillActive]}>
-            <Text style={[styles.toggleText, mode === 'Photo' && styles.toggleTextActive]}>Photo</Text>
-          </Pressable>
-          <Pressable onPress={() => setMode('Video')} style={[styles.togglePill, mode === 'Video' && styles.togglePillActive]}>
-            <Text style={[styles.toggleText, mode === 'Video' && styles.toggleTextActive]}>Video</Text>
-          </Pressable>
-        </View>
+      <View style={styles.titleBlock}>
+        <Text style={styles.title}>Générer</Text>
+        <Text style={styles.subtitle}>Pick a scene, add your face, generate.</Text>
+      </View>
+
+      <View style={styles.toggleRow}>
+        <Pressable
+          onPress={() => setMode('Photo')}
+          style={[styles.togglePill, mode === 'Photo' && styles.togglePillActive]}>
+          <Text style={[styles.toggleText, mode === 'Photo' && styles.toggleTextActive]} numberOfLines={1}>
+            Photo
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setMode('TextToPhoto')}
+          style={[styles.togglePill, mode === 'TextToPhoto' && styles.togglePillActive]}>
+          <Text style={[styles.toggleText, mode === 'TextToPhoto' && styles.toggleTextActive]} numberOfLines={1}>
+            Text to Photo
+          </Text>
+        </Pressable>
       </View>
 
       <FlatList
@@ -65,15 +71,19 @@ export default function StudioScreen() {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <View style={styles.emptyIconWrap}>
-              <Ionicons name={mode === 'Photo' ? 'images-outline' : 'videocam-outline'} size={26} color={Colors.textMuted} />
+              <Ionicons
+                name={mode === 'Photo' ? 'images-outline' : 'chatbubble-ellipses-outline'}
+                size={26}
+                color={Colors.textMuted}
+              />
             </View>
             <Text style={styles.emptyText}>
-              {mode === 'Photo' ? 'New scenes are coming soon.' : 'Video generation is coming soon.'}
+              {mode === 'Photo' ? 'New scenes are coming soon.' : 'Text to Photo is coming soon.'}
             </Text>
           </View>
         }
       />
-    </Animated.View>
+    </View>
   );
 }
 
@@ -96,16 +106,10 @@ const styles = StyleSheet.create({
     color: Colors.accent,
     letterSpacing: 1.5,
   },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
+  titleBlock: {
     paddingHorizontal: 20,
     marginTop: 26,
-    marginBottom: 20,
-  },
-  titleBlock: {
-    flex: 1,
+    marginBottom: 18,
   },
   title: {
     fontSize: 26,
@@ -120,6 +124,8 @@ const styles = StyleSheet.create({
   },
   toggleRow: {
     flexDirection: 'row',
+    marginHorizontal: 20,
+    marginBottom: 20,
     backgroundColor: Colors.surfaceRaised,
     borderRadius: Radius.pill,
     borderWidth: 1,
@@ -130,8 +136,10 @@ const styles = StyleSheet.create({
     padding: 3,
   },
   togglePill: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
     borderRadius: Radius.pill,
   },
   togglePillActive: {

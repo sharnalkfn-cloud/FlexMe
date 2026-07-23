@@ -11,7 +11,6 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppBackground } from '@/components/AppBackground';
@@ -56,7 +55,7 @@ export default function GalerieScreen() {
   }, []);
 
   return (
-    <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <AppBackground />
       <View style={styles.header}>
         <Text style={styles.title}>Galerie</Text>
@@ -95,7 +94,7 @@ export default function GalerieScreen() {
           </Pressable>
         )}
       />
-    </Animated.View>
+    </View>
   );
 }
 

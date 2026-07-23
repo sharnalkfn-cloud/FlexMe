@@ -49,7 +49,7 @@ export default function SceneDetailScreen() {
     if (!scene) return;
     setFormError(null);
     if (faces.length === 0) {
-      setFormError('Add a face in the Snap tab first.');
+      setFormError('Add a face in the Outfit tab first.');
       return;
     }
     if (!apiKey) {

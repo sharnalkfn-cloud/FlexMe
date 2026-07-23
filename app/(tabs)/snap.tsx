@@ -2,7 +2,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppBackground } from '@/components/AppBackground';
@@ -37,11 +36,11 @@ export default function SnapScreen() {
   }, [addFace]);
 
   return (
-    <Animated.View entering={FadeIn.duration(300)} style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <AppBackground />
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 140 }}>
         <View style={styles.header}>
-          <Text style={styles.title}>Snap</Text>
+          <Text style={styles.title}>Outfit</Text>
           <Text style={styles.subtitle}>Capture or upload your face to unlock every scene</Text>
         </View>
 
@@ -85,7 +84,7 @@ export default function SnapScreen() {
           )}
         </View>
       </ScrollView>
-    </Animated.View>
+    </View>
   );
 }
 
